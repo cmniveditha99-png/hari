@@ -2,125 +2,136 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0C0F24">
 <title>Before the feature</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root{
-    --night:#0C0F24;
-    --night-2:#141838;
-    --text:#ECEAF6;
-    --muted:#A8A5C6;
-    --faint:#6E6B8C;
-    --violet:#8B6CFF;
-    --teal:#3EE6C9;
-    --amber:#FFC46B;
-    --pink:#FF7AD9;
-    --line:rgba(236,234,246,.14);
-    --glass:rgba(255,255,255,.045);
+    --night:#0C0F24; --night-2:#141838;
+    --text:#ECEAF6; --muted:#A8A5C6; --faint:#6E6B8C;
+    --violet:#8B6CFF; --teal:#3EE6C9; --amber:#FFC46B; --pink:#FF7AD9;
+    --line:rgba(236,234,246,.14); --glass:rgba(255,255,255,.045);
     --serif:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
     --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--night);color:var(--text)}
-  body{font-family:var(--serif);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-  button{font-family:var(--sans);cursor:pointer}
+  body{font-family:var(--serif);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh}
+  button{font-family:var(--sans);cursor:pointer;-webkit-tap-highlight-color:transparent}
   textarea,input{font-family:var(--serif)}
+  .hidden{display:none !important}
 
-  /* ---- ambient light ---- */
+  /* ---------- ambient world ---------- */
   .aurora{
-    position:fixed;inset:-25%;z-index:-2;pointer-events:none;
+    position:fixed;inset:-25%;z-index:-3;pointer-events:none;
     background:
       radial-gradient(38% 34% at 18% 22%, rgba(139,108,255,.42), transparent 70%),
       radial-gradient(34% 30% at 82% 28%, rgba(62,230,201,.26), transparent 70%),
       radial-gradient(46% 40% at 62% 84%, rgba(255,122,217,.22), transparent 70%),
       radial-gradient(30% 28% at 14% 82%, rgba(255,196,107,.18), transparent 70%);
-    animation:drift 48s ease-in-out infinite alternate;
-    will-change:transform;
+    animation:drift 48s ease-in-out infinite alternate;will-change:transform
   }
-  @keyframes drift{
-    from{transform:translate3d(0,0,0) rotate(0deg) scale(1)}
-    to{transform:translate3d(-4%,3%,0) rotate(5deg) scale(1.06)}
-  }
+  @keyframes drift{from{transform:translate3d(0,0,0) rotate(0deg) scale(1)}to{transform:translate3d(-4%,3%,0) rotate(5deg) scale(1.06)}}
   .grain{
     position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")
   }
+  .bubbles{position:fixed;inset:0;z-index:-2;pointer-events:none;overflow:hidden}
+  .bubble{position:absolute;bottom:-60px;left:var(--x);width:var(--sz);height:var(--sz);animation:rise var(--d) linear var(--delay) infinite;will-change:transform}
+  .bubble i{
+    display:block;width:100%;height:100%;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, rgba(255,255,255,.95), var(--c) 38%, transparent 72%);
+    box-shadow:0 0 10px var(--c),0 0 26px var(--c);
+    animation:sway var(--s) ease-in-out var(--delay) infinite alternate
+  }
+  @keyframes rise{0%{transform:translateY(0);opacity:0}6%{opacity:.9}88%{opacity:.55}100%{transform:translateY(-118vh);opacity:0}}
+  @keyframes sway{from{transform:translateX(-18px) scale(.94)}to{transform:translateX(18px) scale(1.06)}}
+  .shrooms{position:fixed;bottom:-6px;z-index:-2;pointer-events:none;width:150px;opacity:.95}
+  .shrooms.left{left:-12px}
+  .shrooms.right{right:-12px;transform:scaleX(-1)}
+  .mglow{animation:pulse 4.5s ease-in-out infinite alternate;transform-origin:center;transform-box:fill-box}
+  .mglow.b{animation-delay:-1.6s}.mglow.c{animation-delay:-3s}
+  @keyframes pulse{from{opacity:.35;transform:scale(.9)}to{opacity:.95;transform:scale(1.12)}}
 
-  /* ---- top bar ---- */
-  .top{
-    position:sticky;top:0;z-index:5;
-    background:rgba(12,15,36,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-    border-bottom:1px solid var(--line);
-  }
+  /* ---------- top bar ---------- */
+  .top{position:sticky;top:0;z-index:5;background:rgba(12,15,36,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
   .top-inner{max-width:640px;margin:0 auto;padding:12px 20px 10px}
   .top-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
   .top-title{font-size:15px;color:var(--muted);margin:0}
   .status{font-family:var(--sans);font-size:12.5px;color:var(--faint);white-space:nowrap}
-  .status.saving{color:var(--amber)}
-  .status.saved{color:var(--teal)}
-  .status.error{color:var(--pink)}
+  .status.saving{color:var(--amber)} .status.saved{color:var(--teal)} .status.error{color:var(--pink)} .status.offline{color:var(--amber)}
   .progress{height:2px;background:rgba(255,255,255,.08);margin-top:9px;border-radius:2px;overflow:hidden}
-  .progress > i{
-    display:block;height:100%;width:0;border-radius:2px;
-    background:linear-gradient(90deg,var(--violet),var(--teal),var(--amber));
-    box-shadow:0 0 10px rgba(62,230,201,.6);transition:width .5s ease
-  }
+  .progress > i{display:block;height:100%;width:0;border-radius:2px;background:linear-gradient(90deg,var(--violet),var(--teal),var(--amber));box-shadow:0 0 10px rgba(62,230,201,.6);transition:width .5s ease}
 
-  .wrap{max-width:640px;margin:0 auto;padding:0 20px 110px}
+  .wrap{max-width:640px;margin:0 auto;padding:0 20px 120px}
 
-  /* ---- hero ---- */
+  /* ---------- hero + greeting ---------- */
   .hero{position:relative;margin:0 -20px}
   .hero img{
-    display:block;width:100%;aspect-ratio:16/11;object-fit:cover;object-position:50% 30%;
-    -webkit-mask-image:linear-gradient(to bottom,#000 45%,rgba(0,0,0,.6) 72%,transparent 100%);
-    mask-image:linear-gradient(to bottom,#000 45%,rgba(0,0,0,.6) 72%,transparent 100%);
-    filter:saturate(1.15) contrast(1.05);
+    display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:50% 30%;
+    -webkit-mask-image:linear-gradient(to bottom,#000 40%,rgba(0,0,0,.6) 70%,transparent 100%);
+    mask-image:linear-gradient(to bottom,#000 40%,rgba(0,0,0,.6) 70%,transparent 100%);
+    filter:saturate(1.15) contrast(1.05)
   }
-  .beam{
-    position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
-    background:
-      linear-gradient(118deg,transparent 42%,rgba(255,214,150,.22) 52%,rgba(62,230,201,.10) 58%,transparent 66%),
-      radial-gradient(60% 45% at 50% 42%, rgba(139,108,255,.20), transparent 70%);
-  }
-  .hero-text{position:relative;margin-top:-64px;padding:0 20px}
+  .beam{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
+    background:linear-gradient(118deg,transparent 42%,rgba(255,214,150,.22) 52%,rgba(62,230,201,.10) 58%,transparent 66%),
+               radial-gradient(60% 45% at 50% 42%, rgba(139,108,255,.20), transparent 70%)}
+  .hero-text{position:relative;margin-top:-58px}
   h1{
-    font-size:38px;line-height:1.08;font-weight:400;margin:0 0 16px;letter-spacing:-.012em;
-    text-shadow:0 0 28px rgba(139,108,255,.45),0 2px 10px rgba(0,0,0,.6)
+    font-size:44px;line-height:1.05;font-weight:400;margin:0 0 12px;letter-spacing:-.012em;
+    background:linear-gradient(100deg,#FFC46B 0%,#FF7AD9 25%,#8B6CFF 50%,#3EE6C9 75%,#FFC46B 100%);
+    background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:shimmer 9s linear infinite;filter:drop-shadow(0 0 18px rgba(139,108,255,.45))
   }
-  .lede{color:var(--muted);margin:0 0 8px;max-width:32em}
-  .lede em{color:var(--text);font-style:italic}
+  @keyframes shimmer{from{background-position:0% 50%}to{background-position:300% 50%}}
+  .greet{font-size:19px;line-height:1.5;color:var(--text);margin:0 0 6px;max-width:30em}
+  .greet .w{display:inline-block;opacity:0;animation:wordIn .7s ease forwards;animation-delay:var(--dl)}
+  @keyframes wordIn{from{opacity:0;transform:translateY(6px);filter:blur(4px);text-shadow:0 0 18px rgba(62,230,201,.9)}to{opacity:1;transform:none;filter:none;text-shadow:none}}
+  .sub{color:var(--muted);margin:0;font-size:15.5px;max-width:32em}
+  .banner{margin:18px 0 0;padding:12px 14px;border-left:2px solid var(--amber);background:rgba(255,196,107,.08);font-family:var(--sans);font-size:14px;line-height:1.45;color:#F3D9A6}
 
-  .banner{
-    margin:18px 0 0;padding:12px 14px;border-left:2px solid var(--amber);
-    background:rgba(255,196,107,.08);font-family:var(--sans);font-size:14px;line-height:1.45;color:#F3D9A6
+  /* ---------- the reel ---------- */
+  .stage{margin:38px 0 0;text-align:center;position:relative}
+  .reel-wrap{position:relative;width:min(84vw,320px);margin:0 auto;padding-top:22px}
+  .pointer{
+    position:absolute;top:0;left:50%;width:0;height:0;margin-left:-11px;z-index:2;
+    border-left:11px solid transparent;border-right:11px solid transparent;border-top:24px solid var(--amber);
+    filter:drop-shadow(0 0 10px rgba(255,196,107,.9))
   }
-  .hidden{display:none !important}
-  .welcome{margin:18px 0 0;font-family:var(--sans);font-size:14px;color:var(--teal)}
+  .reel-svg{display:block;width:100%;height:auto;filter:drop-shadow(0 0 22px rgba(62,230,201,.35)) drop-shadow(0 0 40px rgba(139,108,255,.25));will-change:transform;transform-origin:50% 50%}
+  .reel-btn{background:none;border:0;padding:0;display:block;width:100%;border-radius:50%}
+  .reel-btn:focus-visible{outline:2px solid var(--teal);outline-offset:6px}
+  .reel-btn:active .reel-svg{filter:drop-shadow(0 0 30px rgba(62,230,201,.6)) drop-shadow(0 0 50px rgba(139,108,255,.4))}
+  .seg-label{font-family:var(--sans);font-size:12.5px;fill:var(--text);letter-spacing:.01em}
+  .seg-label.done{fill:var(--faint)}
+  .stage-hint{margin:18px 0 0;font-style:italic;color:var(--muted);min-height:1.5em}
+  .stage-hint b{font-style:normal;font-weight:500;color:var(--amber);text-shadow:0 0 12px rgba(255,196,107,.6)}
+  .stage-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .btn{border:1px solid rgba(236,234,246,.35);background:rgba(236,234,246,.94);color:var(--night);padding:12px 18px;border-radius:999px;font-size:14.5px;line-height:1;transition:box-shadow .3s,background .2s}
+  .btn:hover{box-shadow:0 0 22px rgba(139,108,255,.45)}
+  .btn.ghost{background:transparent;color:var(--text)}
+  .btn.ghost:hover{background:rgba(255,255,255,.06)}
+  .btn:disabled{opacity:.45;cursor:default;box-shadow:none}
+  .btn:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+  .icon-btn{border:1px solid var(--line);background:transparent;color:var(--muted);width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+  .icon-btn[aria-pressed="true"]{color:var(--teal);border-color:rgba(62,230,201,.5)}
 
-  .name-field{margin:34px 0 10px}
-  .name-field label{display:block;font-family:var(--sans);font-size:13px;color:var(--muted);margin-bottom:4px}
-  .name-field input{
-    width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;
-    padding:6px 0 8px;font-size:19px;color:var(--text);outline:none;transition:border-color .2s
-  }
-  .name-field input:focus{border-bottom-color:var(--teal)}
+  /* ---------- reels / questions ---------- */
+  .chosen{margin-top:34px;animation:reveal .7s ease both}
+  @keyframes reveal{from{opacity:0;transform:translateY(18px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+  .chosen-head{padding:20px 18px 6px;border:1px solid rgba(255,196,107,.28);border-radius:16px 16px 0 0;background:linear-gradient(180deg,rgba(255,196,107,.08),transparent)}
+  .chosen-kicker{font-family:var(--sans);font-size:13px;color:var(--amber);margin:0 0 4px}
+  .chosen-body{padding:6px 18px 6px;border:1px solid var(--line);border-top:0;border-radius:0 0 16px 16px;background:var(--glass)}
+  .reel-title{font-family:var(--serif);font-size:24px;font-weight:400;margin:0 0 4px;line-height:1.2}
+  .reel-epi{font-family:var(--serif);font-style:italic;font-size:14.5px;color:var(--muted);margin:0 0 10px;max-width:30em;line-height:1.45}
+  .chosen-foot{display:flex;justify-content:center;gap:10px;padding:8px 0 18px;flex-wrap:wrap}
 
-  /* ---- reels ---- */
   .reel{border-top:1px solid var(--line);margin-top:22px;position:relative}
   .reel:last-of-type{border-bottom:1px solid var(--line)}
-  .reel.open::before{
-    content:"";position:absolute;left:-20px;top:18px;bottom:18px;width:2px;border-radius:2px;
-    background:linear-gradient(180deg,var(--violet),var(--teal) 60%,transparent);
-    box-shadow:0 0 12px rgba(139,108,255,.55)
-  }
-  .reel-head{
-    width:100%;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
-    background:none;border:0;padding:20px 0;text-align:left;color:var(--text)
-  }
+  .reel.open::before{content:"";position:absolute;left:-20px;top:18px;bottom:18px;width:2px;border-radius:2px;background:linear-gradient(180deg,var(--violet),var(--teal) 60%,transparent);box-shadow:0 0 12px rgba(139,108,255,.55)}
+  .reel-head{width:100%;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;background:none;border:0;padding:20px 0;text-align:left;color:var(--text)}
   .reel-head:focus-visible{outline:2px solid var(--teal);outline-offset:4px}
-  .reel-title{font-family:var(--serif);font-size:23px;font-weight:400;margin:0 0 4px;line-height:1.2}
-  .reel-epi{font-family:var(--serif);font-style:italic;font-size:14.5px;color:var(--muted);margin:0;max-width:30em;line-height:1.45}
   .reel-meta{display:flex;align-items:center;gap:10px;flex-shrink:0;padding-top:6px}
   .count{font-family:var(--sans);font-size:13px;color:var(--faint)}
   .count.done{color:var(--teal);text-shadow:0 0 10px rgba(62,230,201,.7)}
@@ -129,7 +140,7 @@
   .reel-body{display:none;padding:0 0 12px}
   .reel.open .reel-body{display:block}
 
-  .q{display:grid;grid-template-columns:30px 1fr;gap:0 10px;padding:6px 0 26px}
+  .q{display:grid;grid-template-columns:30px 1fr;gap:0 10px;padding:12px 0 26px}
   .q-num{font-family:var(--sans);font-size:13px;color:var(--faint);padding-top:5px;text-align:right;transition:color .3s}
   .q.answered .q-num{color:var(--amber);text-shadow:0 0 10px rgba(255,196,107,.6)}
   .q-text{margin:0 0 8px;font-size:17.5px;line-height:1.5}
@@ -143,112 +154,96 @@
   .q textarea:focus{border-color:rgba(62,230,201,.7);box-shadow:0 0 0 1px rgba(62,230,201,.35),0 0 26px rgba(62,230,201,.18);background:rgba(255,255,255,.06)}
   .q textarea.flash{border-color:var(--amber);box-shadow:0 0 0 1px rgba(255,196,107,.5),0 0 34px rgba(255,196,107,.35)}
   .q-foot{grid-column:2;display:flex;align-items:center;gap:12px;margin-top:10px;min-height:32px}
-  .keep{
-    position:relative;border:1px solid rgba(139,108,255,.55);background:rgba(139,108,255,.14);color:var(--text);
-    padding:7px 14px;border-radius:999px;font-size:13.5px;line-height:1;
-    transition:background .25s,border-color .25s,color .25s,transform .15s
-  }
-  .keep:hover{background:rgba(139,108,255,.26)}
-  .keep:active{transform:scale(.96)}
+  .keep{border:1px solid rgba(139,108,255,.55);background:rgba(139,108,255,.14);color:var(--text);padding:8px 15px;border-radius:999px;font-size:13.5px;line-height:1;transition:background .25s,border-color .25s,color .25s,transform .15s}
+  .keep:hover{background:rgba(139,108,255,.26)} .keep:active{transform:scale(.96)}
   .keep:disabled{opacity:.4;cursor:default}
   .keep.kept{border-color:rgba(62,230,201,.6);background:rgba(62,230,201,.12);color:#CFFBF2}
   .keep:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
   .kept-at{font-family:var(--sans);font-size:12.5px;color:var(--faint)}
 
-  /* ---- sparks ---- */
+  /* ---------- sparks ---------- */
   .sparks{position:fixed;left:0;top:0;pointer-events:none;z-index:60}
-  .sp{
-    position:absolute;width:6px;height:6px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c),0 0 16px var(--c);
-    animation:sp var(--t) cubic-bezier(.15,.7,.25,1) forwards
-  }
-  .sp.star{width:4px;height:4px;border-radius:1px;transform:rotate(45deg)}
+  .sp{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c),0 0 16px var(--c);animation:sp var(--t) cubic-bezier(.15,.7,.25,1) forwards}
+  .sp.star{width:4px;height:4px;border-radius:1px}
   @keyframes sp{from{transform:translate(0,0) scale(1);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
-  .ring{
-    position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;
-    border:1.5px solid var(--amber);box-shadow:0 0 12px rgba(255,196,107,.7);
-    animation:ring .75s ease-out forwards
-  }
+  .ring{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;border:1.5px solid var(--amber);box-shadow:0 0 12px rgba(255,196,107,.7);animation:ring .75s ease-out forwards}
   @keyframes ring{from{transform:scale(.6);opacity:1}to{transform:scale(7);opacity:0}}
 
-  /* ---- panels ---- */
+  /* ---------- export ---------- */
   .panel{margin-top:44px;padding:22px 20px 24px;border:1px solid var(--line);border-radius:16px;background:var(--glass)}
   .panel h2{font-size:22px;font-weight:400;margin:0 0 8px;line-height:1.25}
   .panel p{margin:0 0 14px;color:var(--muted);font-size:15.5px;max-width:34em}
   .btn-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-  .btn{
-    border:1px solid rgba(236,234,246,.35);background:rgba(236,234,246,.94);color:var(--night);
-    padding:11px 16px;border-radius:999px;font-size:14.5px;line-height:1;transition:background .2s,box-shadow .3s
-  }
-  .btn:hover{box-shadow:0 0 22px rgba(139,108,255,.45)}
-  .btn.ghost{background:transparent;color:var(--text);border-color:rgba(236,234,246,.35)}
-  .btn.ghost:hover{background:rgba(255,255,255,.06)}
-  .btn:disabled{opacity:.45;cursor:default;box-shadow:none}
-  .btn:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
-  .time-wrap{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:14px;color:var(--muted)}
-  .time-wrap input{
-    font-family:var(--sans);font-size:14.5px;color:var(--text);background:rgba(255,255,255,.06);
-    border:1px solid var(--line);border-radius:999px;padding:8px 12px;outline:none;color-scheme:dark
-  }
-  .time-wrap input:focus{border-color:var(--teal)}
   .note{font-family:var(--sans);font-size:13px;color:var(--muted);margin-top:12px}
   .note.ok{color:var(--teal)}
-  .small{font-size:13.5px !important;color:var(--faint) !important;margin-top:14px !important}
-
-  .window{
-    position:relative;margin:0 0 18px;border-radius:14px;overflow:hidden;aspect-ratio:16/9;
-    box-shadow:0 0 0 1px rgba(255,196,107,.25),0 0 40px rgba(139,108,255,.25)
-  }
+  .window{position:relative;margin:0 0 18px;border-radius:14px;overflow:hidden;aspect-ratio:16/9;box-shadow:0 0 0 1px rgba(255,196,107,.25),0 0 40px rgba(139,108,255,.25)}
   .window img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 35%;filter:saturate(1.1)}
-  .window::after{
-    content:"";position:absolute;inset:0;pointer-events:none;
-    background:linear-gradient(to top,rgba(12,15,36,.75),transparent 45%),
-               linear-gradient(115deg,transparent 45%,rgba(255,214,150,.16) 55%,transparent 65%);
-  }
-  .window figcaption{
-    position:absolute;left:14px;bottom:12px;font-style:italic;font-size:14px;color:var(--text);
-    text-shadow:0 1px 8px rgba(0,0,0,.8)
-  }
-
+  .window::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,rgba(12,15,36,.75),transparent 45%),linear-gradient(115deg,transparent 45%,rgba(255,214,150,.16) 55%,transparent 65%)}
+  .window figcaption{position:absolute;left:14px;bottom:12px;font-style:italic;font-size:14px;color:var(--text);text-shadow:0 1px 8px rgba(0,0,0,.8)}
   .copybox{margin-top:14px}
-  .copybox textarea{
-    width:100%;height:220px;border:1px solid var(--line);background:rgba(0,0,0,.35);padding:10px;border-radius:10px;
-    font-family:var(--sans);font-size:13px;line-height:1.45;color:var(--text)
-  }
-
+  .copybox textarea{width:100%;height:220px;border:1px solid var(--line);background:rgba(0,0,0,.35);padding:10px;border-radius:10px;font-family:var(--sans);font-size:13px;line-height:1.45;color:var(--text)}
   .danger-row{margin-top:22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
   .link-btn{background:none;border:0;padding:0;font-size:13.5px;color:var(--faint);text-decoration:underline}
-  .link-btn.red{color:#FF9A9A}
-  .link-btn.arm{color:var(--pink);font-weight:600}
+  .link-btn.red{color:#FF9A9A} .link-btn.arm{color:var(--pink);font-weight:600}
 
-  /* ---- fin ---- */
-  .fin{
-    margin-top:44px;padding:34px 20px;text-align:center;border-radius:16px;
-    background:radial-gradient(60% 80% at 50% 0%,rgba(255,196,107,.16),transparent 70%);
-    border:1px solid rgba(255,196,107,.3)
-  }
+  .fin{margin-top:44px;padding:34px 20px;text-align:center;border-radius:16px;background:radial-gradient(60% 80% at 50% 0%,rgba(255,196,107,.16),transparent 70%);border:1px solid rgba(255,196,107,.3)}
   .fin h2{font-size:52px;font-weight:400;margin:0 0 10px;font-style:italic;color:var(--amber);text-shadow:0 0 30px rgba(255,196,107,.6)}
   .fin p{color:var(--muted);margin:0 auto;max-width:30em}
 
   @media (prefers-reduced-motion:reduce){
-    .aurora{animation:none}
+    .aurora,.bubble,.bubble i,.mglow,h1{animation:none}
+    .greet .w{animation:none;opacity:1}
+    .chosen{animation:none}
     .progress > i,.chev,.q textarea{transition:none}
     .sp,.ring{animation-duration:.01s}
   }
-  @media (min-width:600px){
-    h1{font-size:46px}
-    .hero img{aspect-ratio:16/9}
-  }
+  @media (min-width:600px){h1{font-size:54px}.hero img{aspect-ratio:16/9}.shrooms{width:190px}}
 </style>
 </head>
 <body>
 <div class="aurora" aria-hidden="true"></div>
+<div class="bubbles" id="bubbles" aria-hidden="true"></div>
+<svg class="shrooms left" viewBox="0 0 160 120" aria-hidden="true">
+  <defs>
+    <radialGradient id="capT" cx="45%" cy="35%" r="70%"><stop offset="0" stop-color="#8CF5E2"/><stop offset=".55" stop-color="#3EE6C9"/><stop offset="1" stop-color="#176B5C"/></radialGradient>
+    <radialGradient id="capV" cx="45%" cy="35%" r="70%"><stop offset="0" stop-color="#C9B8FF"/><stop offset=".55" stop-color="#8B6CFF"/><stop offset="1" stop-color="#3E2C8A"/></radialGradient>
+    <radialGradient id="capP" cx="45%" cy="35%" r="70%"><stop offset="0" stop-color="#FFC1EC"/><stop offset=".55" stop-color="#FF7AD9"/><stop offset="1" stop-color="#7A2A65"/></radialGradient>
+    <linearGradient id="stem" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F1ECFF"/><stop offset="1" stop-color="#B9B0DA"/></linearGradient>
+  </defs>
+  <ellipse class="mglow" cx="62" cy="62" rx="46" ry="20" fill="rgba(62,230,201,.28)"/>
+  <ellipse class="mglow b" cx="118" cy="86" rx="26" ry="12" fill="rgba(139,108,255,.32)"/>
+  <ellipse class="mglow c" cx="26" cy="96" rx="18" ry="9" fill="rgba(255,122,217,.32)"/>
+  <path d="M54 120 C52 100 51 88 57 66 L69 66 C75 88 74 100 72 120 Z" fill="url(#stem)"/>
+  <path d="M22 70 C24 40 44 24 63 24 C82 24 102 40 104 70 C86 64 40 64 22 70 Z" fill="url(#capT)"/>
+  <circle cx="46" cy="44" r="4.5" fill="#EFFFFB" opacity=".85"/><circle cx="72" cy="36" r="3.4" fill="#EFFFFB" opacity=".85"/><circle cx="86" cy="54" r="2.8" fill="#EFFFFB" opacity=".8"/><circle cx="60" cy="56" r="2.6" fill="#EFFFFB" opacity=".7"/>
+  <path d="M112 120 C111 106 111 98 114 86 L122 86 C125 98 125 106 124 120 Z" fill="url(#stem)"/>
+  <path d="M96 90 C98 72 108 64 118 64 C128 64 138 72 140 90 C128 86 108 86 96 90 Z" fill="url(#capV)"/>
+  <circle cx="110" cy="76" r="2.6" fill="#F3EEFF" opacity=".85"/><circle cx="126" cy="72" r="2" fill="#F3EEFF" opacity=".85"/>
+  <path d="M22 120 C22 110 22 104 24 96 L30 96 C32 104 32 110 32 120 Z" fill="url(#stem)"/>
+  <path d="M10 100 C12 88 19 82 27 82 C35 82 42 88 44 100 C34 96 20 96 10 100 Z" fill="url(#capP)"/>
+  <circle cx="22" cy="90" r="1.8" fill="#FFF0FA" opacity=".9"/><circle cx="32" cy="88" r="1.5" fill="#FFF0FA" opacity=".9"/>
+</svg>
+<svg class="shrooms right" viewBox="0 0 160 120" aria-hidden="true">
+  <ellipse class="mglow c" cx="62" cy="62" rx="46" ry="20" fill="rgba(139,108,255,.3)"/>
+  <ellipse class="mglow" cx="118" cy="86" rx="26" ry="12" fill="rgba(255,122,217,.3)"/>
+  <ellipse class="mglow b" cx="26" cy="96" rx="18" ry="9" fill="rgba(62,230,201,.32)"/>
+  <path d="M54 120 C52 100 51 88 57 66 L69 66 C75 88 74 100 72 120 Z" fill="url(#stem)"/>
+  <path d="M22 70 C24 40 44 24 63 24 C82 24 102 40 104 70 C86 64 40 64 22 70 Z" fill="url(#capV)"/>
+  <circle cx="46" cy="44" r="4.5" fill="#F3EEFF" opacity=".85"/><circle cx="72" cy="36" r="3.4" fill="#F3EEFF" opacity=".85"/><circle cx="86" cy="54" r="2.8" fill="#F3EEFF" opacity=".8"/>
+  <path d="M112 120 C111 106 111 98 114 86 L122 86 C125 98 125 106 124 120 Z" fill="url(#stem)"/>
+  <path d="M96 90 C98 72 108 64 118 64 C128 64 138 72 140 90 C128 86 108 86 96 90 Z" fill="url(#capP)"/>
+  <circle cx="110" cy="76" r="2.6" fill="#FFF0FA" opacity=".85"/><circle cx="126" cy="72" r="2" fill="#FFF0FA" opacity=".85"/>
+  <path d="M22 120 C22 110 22 104 24 96 L30 96 C32 104 32 110 32 120 Z" fill="url(#stem)"/>
+  <path d="M10 100 C12 88 19 82 27 82 C35 82 42 88 44 100 C34 96 20 96 10 100 Z" fill="url(#capT)"/>
+  <circle cx="22" cy="90" r="1.8" fill="#EFFFFB" opacity=".9"/><circle cx="32" cy="88" r="1.5" fill="#EFFFFB" opacity=".9"/>
+</svg>
 <div class="grain" aria-hidden="true"></div>
 
 <div class="top">
   <div class="top-inner">
     <div class="top-row">
       <p class="top-title" id="topCount">0 of 18 kept</p>
-      <span class="status" id="saveStatus">Loading…</span>
+      <span class="status" id="saveStatus">Warming up…</span>
     </div>
     <div class="progress"><i id="progressBar"></i></div>
   </div>
@@ -260,38 +255,29 @@
     <div class="beam" aria-hidden="true"></div>
   </header>
   <div class="hero-text">
-    <h1>Before the feature.</h1>
-    <p class="lede">Eighteen questions, six reels. Answer in any order, in rough notes if you like, and leave whenever you need. <em>The projector stays warm and every word is kept.</em></p>
-    <p class="lede">When the last reel is done, take it out of the booth as a PDF or Word file.</p>
-
-    <div class="banner hidden" id="storageBanner">
-      Automatic saving isn't available where this page is open. Your answers stay only while this tab is open, so download or copy them before you leave.
-    </div>
-    <p class="welcome hidden" id="welcome"></p>
-
-    <div class="name-field">
-      <label for="nameInput">Your name (optional)</label>
-      <input id="nameInput" type="text" autocomplete="name">
-    </div>
+    <h1 id="greetName">Hari,</h1>
+    <p class="greet" id="greetLine"></p>
+    <p class="sub" id="greetSub"></p>
+    <div class="banner hidden" id="offlineBanner">The booth is out of reach right now. Your answers are being kept on this phone and will sync the moment it reconnects.</div>
   </div>
 
-  <div id="reels"></div>
-
-  <section class="panel" id="remindPanel">
-    <h2>Keep the projector warm</h2>
-    <p>This page can't message you on its own. Put a reminder on your phone instead: one tap adds it to your calendar, and it stops by itself after two weeks. Delete it early once the last reel is done.</p>
-    <div class="btn-row">
-      <button class="btn" id="btnIcs2h">Every 2 hours, 10 am to 10 pm</button>
+  <section class="stage" id="stage">
+    <div class="reel-wrap">
+      <div class="pointer" id="pointer" aria-hidden="true"></div>
+      <button class="reel-btn" id="reelBtn" type="button" aria-label="Spin the reel to choose a set of questions">
+        <svg class="reel-svg" id="reel" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"></svg>
+      </button>
     </div>
-    <div class="btn-row" style="margin-top:10px">
-      <button class="btn ghost" id="btnIcsDaily">Once a day</button>
-      <span class="time-wrap">at <input type="time" id="dailyTime" value="21:00"></span>
+    <p class="stage-hint" id="stageHint">Tap the reel. It picks tonight's questions for you.</p>
+    <div class="stage-actions">
+      <button class="btn" id="btnSpin">Spin the reel</button>
+      <button class="btn ghost" id="btnAll">Show everything</button>
+      <button class="icon-btn" id="btnSound" aria-pressed="true" aria-label="Sound on" title="Sound">♪</button>
     </div>
-    <div class="btn-row" style="margin-top:10px">
-      <button class="btn ghost" id="btnWa">Send my progress on WhatsApp</button>
-    </div>
-    <p class="note hidden" id="remindNote"></p>
   </section>
+
+  <section class="chosen hidden" id="chosen"></section>
+  <section id="allReels" class="hidden"></section>
 
   <section class="panel" id="exportPanel">
     <figure class="window">
@@ -299,16 +285,14 @@
       <figcaption>Alfredo's window</figcaption>
     </figure>
     <h2>Take it out of the booth</h2>
-    <p>Export any time, finished or not. Blank answers are marked so nothing gets lost.</p>
+    <p>Export any time, finished or not. Blank answers are marked so nothing gets lost. Edit as much as you like first; this is your final cut.</p>
     <div class="btn-row">
       <button class="btn" id="btnPdf">Download PDF</button>
       <button class="btn" id="btnDoc">Download Word</button>
       <button class="btn ghost" id="btnCopy">Copy as text</button>
     </div>
     <p class="note hidden" id="exportNote"></p>
-    <div class="copybox hidden" id="copybox">
-      <textarea id="copyArea" readonly></textarea>
-    </div>
+    <div class="copybox hidden" id="copybox"><textarea id="copyArea" readonly></textarea></div>
     <div class="danger-row">
       <button class="link-btn red" id="btnReset">Clear all answers</button>
       <span class="status" id="lastSaved"></span>
@@ -317,7 +301,7 @@
 
   <section class="fin hidden" id="fin">
     <h2>Fin.</h2>
-    <p>All eighteen kept and exported. Delete the reminder; the booth is closed. Send the file, and the plan begins.</p>
+    <p>All eighteen kept and exported. Send the file, and the plan begins.</p>
   </section>
 </main>
 
@@ -325,76 +309,47 @@
 
 <script>
 (function(){
+  const NAME = 'Hari';
   const REELS = [
-    { id:'daily', title:'Daily reality',
-      epi:'Groundhog Day, 1993. Before anything can change, I need the day exactly as it repeats.' },
-    { id:'work', title:'Work',
-      epi:'Day for Night, 1973. A film about the beautiful mess of making a film. Show me yours.' },
-    { id:'money', title:'Money',
-      epi:'It\u2019s a Wonderful Life, 1946. The ledger is the dullest part of a life, and it still has to balance.' },
-    { id:'health', title:'Health',
-      epi:'Rocky, 1976. The montage is the part they cut. This is the part they cut.' },
-    { id:'mind', title:'Psychology',
-      epi:'Rear Window, 1954. What you notice when you finally sit still and look.' },
-    { id:'vision', title:'Vision',
-      epi:'Cinema Paradiso, 1988. Alfredo sent Tot\u00F2 away so he\u2019d become someone. Where are you going?' }
+    { id:'daily',  title:'Daily reality', epi:'Groundhog Day, 1993. Before anything can change, I need the day exactly as it repeats.' },
+    { id:'work',   title:'Work',          epi:'Day for Night, 1973. A film about the beautiful mess of making a film. Show me yours.' },
+    { id:'money',  title:'Money',         epi:'It\u2019s a Wonderful Life, 1946. The ledger is the dullest part of a life, and it still has to balance.' },
+    { id:'health', title:'Health',        epi:'Rocky, 1976. The montage is the part they cut. This is the part they cut.' },
+    { id:'mind',   title:'Psychology',    epi:'Rear Window, 1954. What you notice when you finally sit still and look.' },
+    { id:'vision', title:'Vision',        epi:'Cinema Paradiso, 1988. Alfredo sent Tot\u00F2 away so he\u2019d become someone. Where are you going?' }
   ];
-
   const QUESTIONS = [
-    { id:'q1', r:'daily',
-      text:'Walk me through a typical weekday hour by hour: wake time, first thing you do, when work happens, meals, screen time, bedtime. Then a typical day off.',
-      hint:'Two rough timelines, one for a work day and one for a day off.' },
-    { id:'q2', r:'daily',
-      text:'When do you first smoke each day, how many sessions, and what usually triggers each one (boredom, anxiety, habit, social, sleep)? Have you ever gone 3+ days without it, and what happened?' },
-    { id:'q3', r:'daily',
-      text:'Sleep: how many hours, what quality, and do you wake up rested?' },
-
-    { id:'q4', r:'work',
-      text:'Monthly income over the last 12 months: best month, worst month, rough average. What is in the pipeline right now?' },
-    { id:'q5', r:'work',
-      text:'When a gig comes in, what actually happens between \u201Cyes\u201D and \u201Cdelivered\u201D? Where does it stall: replying, starting, the middle, finishing, invoicing?' },
-    { id:'q6', r:'work',
-      text:'Which of your skills is most in demand, and what would you need to do or be known for to earn 2\u20133x for the same hours?' },
-    { id:'q7', r:'work',
-      text:'What have you made that you are proud of, and when was the last time?' },
-
-    { id:'q8', r:'money',
-      text:'How is the 10 lakhs split: cards, personal loans, friends and family, informal lenders? What is the interest rate and minimum payment on each?',
-      hint:'One line per debt is enough.' },
-    { id:'q9', r:'money',
-      text:'Rough monthly expenses: rent, food, weed, subscriptions, EMIs. Who do you live with, and does anyone depend on you financially?' },
-
-    { id:'q10', r:'health',
-      text:'Has a doctor evaluated the stomach and breathing problems? Any diagnosis, tests or medication? Do you mix tobacco with the marijuana?' },
-    { id:'q11', r:'health',
-      text:'Approximate height and weight, what you eat on a normal day, and any exercise in the past year. What physical activity have you ever stuck with?' },
-
-    { id:'q12', r:'mind',
-      text:'When you do get things done, what conditions make it happen: a deadline, a specific person, a location, a time of day?' },
-    { id:'q13', r:'mind',
-      text:'You mentioned chronic stress from past decisions. Is it guilt about something finished, or something still ongoing? Keep the details as vague as you like; what matters is whether it is a wound or an open problem.' },
-    { id:'q14', r:'mind',
-      text:'Have you ever been assessed for ADHD, anxiety or depression, or suspected it yourself? Any therapy history?' },
-    { id:'q15', r:'mind',
-      text:'Who knows about this plan, and would you let one person hold you accountable weekly?' },
-
-    { id:'q16', r:'vision',
-      text:'\u201CMajor filmmaker\u201D in five years, concretely: a feature directed? A specific festival? An income figure? What kind of films?' },
-    { id:'q17', r:'vision',
-      text:'Why now? What changed, or what do you fear happens if nothing does?' },
-    { id:'q18', r:'vision',
-      text:'Anything else worth knowing that these questions did not ask?',
-      hint:'Optional.' }
+    { id:'q1', r:'daily', text:'Walk me through a typical weekday hour by hour: wake time, first thing you do, when work happens, meals, screen time, bedtime. Then a typical day off.', hint:'Two rough timelines, one for a work day and one for a day off.' },
+    { id:'q2', r:'daily', text:'When do you first smoke each day, how many sessions, and what usually triggers each one (boredom, anxiety, habit, social, sleep)? Have you ever gone 3+ days without it, and what happened?' },
+    { id:'q3', r:'daily', text:'Sleep: how many hours, what quality, and do you wake up rested?' },
+    { id:'q4', r:'work', text:'Monthly income over the last 12 months: best month, worst month, rough average. What is in the pipeline right now?' },
+    { id:'q5', r:'work', text:'When a gig comes in, what actually happens between \u201Cyes\u201D and \u201Cdelivered\u201D? Where does it stall: replying, starting, the middle, finishing, invoicing?' },
+    { id:'q6', r:'work', text:'Which of your skills is most in demand, and what would you need to do or be known for to earn 2\u20133x for the same hours?' },
+    { id:'q7', r:'work', text:'What have you made that you are proud of, and when was the last time?' },
+    { id:'q8', r:'money', text:'How is the 10 lakhs split: cards, personal loans, friends and family, informal lenders? What is the interest rate and minimum payment on each?', hint:'One line per debt is enough.' },
+    { id:'q9', r:'money', text:'Rough monthly expenses: rent, food, weed, subscriptions, EMIs. Who do you live with, and does anyone depend on you financially?' },
+    { id:'q10', r:'health', text:'Has a doctor evaluated the stomach and breathing problems? Any diagnosis, tests or medication? Do you mix tobacco with the marijuana?' },
+    { id:'q11', r:'health', text:'Approximate height and weight, what you eat on a normal day, and any exercise in the past year. What physical activity have you ever stuck with?' },
+    { id:'q12', r:'mind', text:'When you do get things done, what conditions make it happen: a deadline, a specific person, a location, a time of day?' },
+    { id:'q13', r:'mind', text:'You mentioned chronic stress from past decisions. Is it guilt about something finished, or something still ongoing? Keep the details as vague as you like; what matters is whether it is a wound or an open problem.' },
+    { id:'q14', r:'mind', text:'Have you ever been assessed for ADHD, anxiety or depression, or suspected it yourself? Any therapy history?' },
+    { id:'q15', r:'mind', text:'Who knows about this plan, and would you let one person hold you accountable weekly?' },
+    { id:'q16', r:'vision', text:'\u201CMajor filmmaker\u201D in five years, concretely: a feature directed? A specific festival? An income figure? What kind of films?' },
+    { id:'q17', r:'vision', text:'Why now? What changed, or what do you fear happens if nothing does?' },
+    { id:'q18', r:'vision', text:'Anything else worth knowing that these questions did not ask?', hint:'Optional.' }
   ];
 
-  const KEY = 'life_intake_v2';
-  const OLD_KEY = 'life_intake_v1';
-  const hasStorage = !!(window.storage && typeof window.storage.get === 'function');
+  const API = '/api/state';
+  const LKEY = 'intake_hari_v3';
+  const SKEY = 'intake_sound';
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  let state = { name:'', answers:{}, kept:{}, exported:false, updatedAt:null };
-  let savedValues = {};           // value of each answer at the last successful save
-  let saveTimer = null, dirty = false;
+  let state = { name:NAME, answers:{}, kept:{}, exported:false, updatedAt:null };
+  let savedValues = {};
+  let pendingEvents = [];
+  let saveTimer = null, dirty = false, online = false, saving = false;
+  let currentReel = null, viewAll = false;
+  let soundOn = true;
 
   const $ = id => document.getElementById(id);
   const statusEl = $('saveStatus'), lastSavedEl = $('lastSaved');
@@ -409,258 +364,412 @@
   function answered(id){ return ((state.answers[id] || '').trim().length > 0); }
   function answeredCount(){ return QUESTIONS.filter(q => answered(q.id)).length; }
   function reelQs(rid){ return QUESTIONS.filter(q => q.r === rid); }
+  function reelDone(rid){ return reelQs(rid).every(q => answered(q.id)); }
   function snapshotSaved(){ QUESTIONS.forEach(q => { savedValues[q.id] = state.answers[q.id] || ''; }); }
+  function progressSummary(){
+    return { answered: answeredCount(), total: QUESTIONS.length,
+      sections: REELS.map(r => ({ title:r.title, done: reelQs(r.id).filter(q => answered(q.id)).length, total: reelQs(r.id).length })) };
+  }
 
-  /* ---------- storage ---------- */
-  async function readKey(k){
-    try{ const r = await window.storage.get(k, false); return (r && r.value) ? JSON.parse(r.value) : null; }catch(e){ return null; }
+  /* ---------- storage: server first, phone as backup ---------- */
+  function readLocal(){ try{ const raw = localStorage.getItem(LKEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; } }
+  function writeLocal(){ try{ localStorage.setItem(LKEY, JSON.stringify({ state, pendingEvents })); }catch(e){} }
+  function adopt(data){
+    if(!data) return;
+    state.answers = data.answers || {}; state.kept = data.kept || {};
+    state.exported = !!data.exported; state.updatedAt = data.updatedAt || null;
+  }
+  async function serverGet(){
+    const r = await fetch(API, { cache:'no-store' });
+    if(!r.ok) throw new Error('get ' + r.status);
+    return (await r.json()).state;
+  }
+  async function serverPut(events){
+    const r = await fetch(API, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ state, events }) });
+    if(!r.ok) throw new Error('put ' + r.status);
+    return r.json();
   }
   async function load(){
-    if(!hasStorage){ $('storageBanner').classList.remove('hidden'); setStatus('Not saving', 'error'); return; }
-    let data = await readKey(KEY);
-    if(!data){ data = await readKey(OLD_KEY); }        // carry over anything typed into the earlier version
-    if(data){
-      state.name = data.name || '';
-      state.answers = data.answers || {};
-      state.kept = data.kept || {};
-      state.exported = !!data.exported;
-      state.updatedAt = data.updatedAt || null;
+    const local = readLocal();
+    if(local){ adopt(local.state); pendingEvents = local.pendingEvents || []; }
+    try{
+      const remote = await serverGet();
+      online = true;
+      const localNewer = !!(local && local.state && local.state.updatedAt && (!remote || !remote.updatedAt || local.state.updatedAt > remote.updatedAt));
+      if(remote && !localNewer) adopt(remote);
+      $('offlineBanner').classList.add('hidden');
+      setStatus(state.updatedAt ? 'Kept ' + fmtTime(state.updatedAt) : 'Ready', 'saved');
+      if(pendingEvents.length || localNewer) save([]);
+    }catch(e){
+      online = false;
+      $('offlineBanner').classList.remove('hidden');
+      setStatus('Kept on this phone only', 'offline');
     }
     snapshotSaved();
-    const n = answeredCount();
-    if(n > 0){
-      const w = $('welcome');
-      w.textContent = 'Welcome back' + (state.name.trim() ? ', ' + state.name.trim() : '') +
-        '. The reel is where you left it: ' + n + ' of ' + QUESTIONS.length + ' kept, last saved ' + fmtTime(state.updatedAt) + '.';
-      w.classList.remove('hidden');
-    }
-    setStatus(state.updatedAt ? 'Saved ' + fmtTime(state.updatedAt) : 'Saved automatically', 'saved');
+    writeLocal();
   }
-  async function save(){
-    if(!hasStorage){ dirty = false; snapshotSaved(); refreshKeepButtons(); return true; }
-    setStatus('Saving\u2026', 'saving');
+  async function save(events){
+    events = events || [];
+    if(saving){ pendingEvents.push(...events); dirty = true; return; }
+    saving = true;
     state.updatedAt = new Date().toISOString();
+    const batch = pendingEvents.concat(events); pendingEvents = [];
+    writeLocal();
+    setStatus('Keeping\u2026', 'saving');
     try{
-      const res = await window.storage.set(KEY, JSON.stringify(state), false);
-      if(!res) throw new Error('no result');
-      dirty = false;
-      snapshotSaved();
-      refreshKeepButtons();
-      setStatus('Saved ' + fmtTime(state.updatedAt), 'saved');
-      lastSavedEl.textContent = 'Last saved ' + fmtTime(state.updatedAt);
-      return true;
+      await serverPut(batch);
+      online = true; dirty = false;
+      $('offlineBanner').classList.add('hidden');
+      setStatus('Kept ' + fmtTime(state.updatedAt), 'saved');
+      lastSavedEl.textContent = 'Last kept ' + fmtTime(state.updatedAt);
     }catch(e){
-      setStatus('Could not save, will retry', 'error');
-      dirty = true;
-      setTimeout(save, 4000);
-      return false;
+      online = false;
+      pendingEvents = batch.concat(pendingEvents);
+      $('offlineBanner').classList.remove('hidden');
+      setStatus('Kept on this phone only', 'offline');
+      setTimeout(() => { if(!saving) save([]); }, 20000);
     }
+    snapshotSaved(); refreshKeepButtons(); writeLocal();
+    saving = false;
+    if(dirty && pendingEvents.length){ dirty = false; save([]); }
   }
   function scheduleSave(){
-    dirty = true;
+    dirty = true; writeLocal();
     setStatus('Unsaved changes', 'saving');
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(save, 5000);       // quiet safety net; the Save button is the deliberate act
+    saveTimer = setTimeout(() => save([]), 15000);
   }
-  function flush(){ if(dirty){ clearTimeout(saveTimer); save(); } }
+  function flush(){ if(dirty){ clearTimeout(saveTimer); save([]); } }
   document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'hidden') flush(); });
   window.addEventListener('pagehide', flush);
-  window.addEventListener('beforeunload', flush);
+  window.addEventListener('online', () => save([]));
+
+  /* ---------- sound ---------- */
+  let actx = null, master = null, noiseBuf = null;
+  function ensureAudio(){
+    if(!actx){
+      const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return false;
+      actx = new AC();
+      const comp = actx.createDynamicsCompressor();
+      master = actx.createGain(); master.gain.value = .9;
+      master.connect(comp); comp.connect(actx.destination);
+      noiseBuf = actx.createBuffer(1, actx.sampleRate * 2, actx.sampleRate);
+      const d = noiseBuf.getChannelData(0); for(let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    if(actx.state === 'suspended') actx.resume();
+    return true;
+  }
+  function click(t, strength){
+    const src = actx.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+    const bp = actx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1600 + Math.random() * 900; bp.Q.value = 1.4;
+    const g = actx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.32 * strength, t + 0.002);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+    src.connect(bp); bp.connect(g); g.connect(master);
+    src.start(t); src.stop(t + 0.04);
+  }
+  function tone(t, freq, gain, dur, type){
+    const o = actx.createOscillator(); o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t);
+    const g = actx.createGain();
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  }
+  function spinSound(rotFrom, delta, D){
+    if(!soundOn || !ensureAudio()) return;
+    const t0 = actx.currentTime + 0.06, secs = D / 1000;
+    const ease = x => 1 - Math.pow(1 - x, 5);
+    let lastStep = Math.floor(rotFrom / 15);
+    for(let ms = 0; ms <= D; ms += 4){
+      const x = ms / D, ang = rotFrom + delta * ease(x), step = Math.floor(ang / 15);
+      if(step > lastStep){ const s = Math.pow(1 - x, 4); click(t0 + ms / 1000, 0.3 + 0.7 * Math.min(1, s * 1.4)); lastStep = step; }
+    }
+    // motor hum that follows the speed
+    const hum = actx.createOscillator(); hum.type = 'sawtooth';
+    const lp = actx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 320;
+    const hg = actx.createGain(); hg.gain.setValueAtTime(0.0001, t0);
+    const whirr = actx.createBufferSource(); whirr.buffer = noiseBuf; whirr.loop = true;
+    const wlp = actx.createBiquadFilter(); wlp.type = 'lowpass'; wlp.frequency.value = 700;
+    const wg = actx.createGain(); wg.gain.setValueAtTime(0.0001, t0);
+    for(let i = 0; i <= 24; i++){
+      const x = i / 24, s = Math.pow(1 - x, 4), t = t0 + secs * x;
+      hg.gain.linearRampToValueAtTime(0.06 * s + 0.0001, t);
+      hum.frequency.linearRampToValueAtTime(42 + 95 * s, t);
+      wg.gain.linearRampToValueAtTime(0.045 * s + 0.0001, t);
+    }
+    hum.connect(lp); lp.connect(hg); hg.connect(master); hum.start(t0); hum.stop(t0 + secs + 0.2);
+    whirr.connect(wlp); wlp.connect(wg); wg.connect(master); whirr.start(t0); whirr.stop(t0 + secs + 0.2);
+    // landing: a soft thud, then a chime
+    const tl = t0 + secs;
+    const thud = actx.createOscillator(); thud.type = 'sine';
+    thud.frequency.setValueAtTime(95, tl); thud.frequency.exponentialRampToValueAtTime(34, tl + 0.3);
+    const tg = actx.createGain(); tg.gain.setValueAtTime(0.0001, tl); tg.gain.exponentialRampToValueAtTime(0.5, tl + 0.01); tg.gain.exponentialRampToValueAtTime(0.0001, tl + 0.35);
+    thud.connect(tg); tg.connect(master); thud.start(tl); thud.stop(tl + 0.4);
+    [659.25, 830.61, 987.77, 1318.51].forEach((f, i) => tone(tl + 0.14 + i * 0.085, f, 0.16, 0.6));
+  }
+  function keepSound(){
+    if(!soundOn || !ensureAudio()) return;
+    const t = actx.currentTime + 0.02;
+    tone(t, 1318.51, 0.11, 0.35); tone(t + 0.07, 1975.53, 0.09, 0.45);
+  }
+  function setSound(on){
+    soundOn = on; try{ localStorage.setItem(SKEY, on ? '1' : '0'); }catch(e){}
+    const b = $('btnSound'); b.setAttribute('aria-pressed', String(on)); b.setAttribute('aria-label', on ? 'Sound on' : 'Sound off'); b.textContent = on ? '\u266A' : '\u00B7';
+  }
 
   /* ---------- sparks ---------- */
   const COLORS = ['#3EE6C9','#8B6CFF','#FFC46B','#FF7AD9','#FFFFFF'];
-  function spark(el){
+  function spark(el, big){
     const rect = el.getBoundingClientRect();
     const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
     const host = $('sparks');
-    const ring = document.createElement('span');
-    ring.className = 'ring'; ring.style.left = cx + 'px'; ring.style.top = cy + 'px';
-    host.appendChild(ring);
-    const n = reduceMotion ? 4 : 18;
+    const ring = document.createElement('span'); ring.className = 'ring'; ring.style.left = cx + 'px'; ring.style.top = cy + 'px'; host.appendChild(ring);
+    const n = reduceMotion ? 4 : (big ? 34 : 18);
     for(let i = 0; i < n; i++){
-      const s = document.createElement('span');
-      s.className = 'sp' + (Math.random() < .35 ? ' star' : '');
-      const ang = (Math.PI * 2) * (i / n) + (Math.random() - .5) * .6;
-      const dist = 38 + Math.random() * 62;
+      const s = document.createElement('span'); s.className = 'sp' + (Math.random() < .35 ? ' star' : '');
+      const ang = (Math.PI * 2) * (i / n) + (Math.random() - .5) * .6, dist = (big ? 60 : 38) + Math.random() * (big ? 110 : 62);
       s.style.left = cx + 'px'; s.style.top = cy + 'px';
-      s.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
-      s.style.setProperty('--dy', Math.sin(ang) * dist - 14 + 'px');
-      s.style.setProperty('--c', COLORS[i % COLORS.length]);
-      s.style.setProperty('--t', (0.55 + Math.random() * 0.5) + 's');
+      s.style.setProperty('--dx', Math.cos(ang) * dist + 'px'); s.style.setProperty('--dy', Math.sin(ang) * dist - 14 + 'px');
+      s.style.setProperty('--c', COLORS[i % COLORS.length]); s.style.setProperty('--t', (0.55 + Math.random() * 0.6) + 's');
       host.appendChild(s);
     }
-    setTimeout(() => { host.innerHTML = ''; }, 1300);
+    setTimeout(() => { host.innerHTML = ''; }, 1400);
   }
 
-  /* ---------- rendering ---------- */
-  function grow(el){ el.style.height = 'auto'; el.style.height = Math.max(96, el.scrollHeight) + 'px'; }
+  /* ---------- bubbles ---------- */
+  (function bubbles(){
+    if(reduceMotion) return;
+    const host = $('bubbles'), cols = ['#3EE6C9','#8B6CFF','#FF7AD9','#FFC46B'];
+    for(let i = 0; i < 16; i++){
+      const b = document.createElement('span'); b.className = 'bubble';
+      b.style.setProperty('--x', (Math.random() * 100) + '%');
+      b.style.setProperty('--sz', (7 + Math.random() * 20) + 'px');
+      b.style.setProperty('--d', (20 + Math.random() * 26) + 's');
+      b.style.setProperty('--s', (4 + Math.random() * 5) + 's');
+      b.style.setProperty('--delay', (-Math.random() * 40) + 's');
+      b.style.setProperty('--c', cols[i % cols.length]);
+      b.innerHTML = '<i></i>'; host.appendChild(b);
+    }
+  })();
 
+  /* ---------- the reel ---------- */
+  const C = 150, R_IN = 46;
+  function pt(r, deg){ const a = (deg - 90) * Math.PI / 180; return [C + r * Math.cos(a), C + r * Math.sin(a)]; }
+  function wedge(a0, a1, rIn, rOut){
+    const [x0,y0] = pt(rOut,a0), [x1,y1] = pt(rOut,a1), [x2,y2] = pt(rIn,a1), [x3,y3] = pt(rIn,a0);
+    return 'M' + x0 + ' ' + y0 + ' A' + rOut + ' ' + rOut + ' 0 0 1 ' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2 + ' A' + rIn + ' ' + rIn + ' 0 0 0 ' + x3 + ' ' + y3 + ' Z';
+  }
+  const SEG_FILL = ['rgba(139,108,255,.22)','rgba(62,230,201,.16)','rgba(255,122,217,.16)','rgba(255,196,107,.16)','rgba(62,230,201,.16)','rgba(139,108,255,.22)'];
+  function drawReel(){
+    const svg = $('reel');
+    let s = '<defs><radialGradient id="hub" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#2A2F63"/><stop offset="1" stop-color="#0F1230"/></radialGradient></defs>';
+    s += '<circle cx="150" cy="150" r="146" fill="rgba(12,15,36,.75)" stroke="rgba(62,230,201,.85)" stroke-width="3"/>';
+    s += '<circle cx="150" cy="150" r="128" fill="none" stroke="rgba(236,234,246,.18)" stroke-width="1"/>';
+    REELS.forEach((r, i) => {
+      const a = i * 60, done = reelDone(r.id);
+      s += '<path id="seg-' + r.id + '" d="' + wedge(a - 29.2, a + 29.2, R_IN + 4, 126) + '" fill="' + (done ? 'rgba(110,107,140,.12)' : SEG_FILL[i]) + '" stroke="rgba(236,234,246,.16)" stroke-width="1"/>';
+      const [lx, ly] = pt(88, a);
+      let rot = a - 90; if(a > 180) rot += 180;
+      s += '<text class="seg-label' + (done ? ' done' : '') + '" x="' + lx + '" y="' + ly + '" text-anchor="middle" dominant-baseline="middle" transform="rotate(' + rot + ' ' + lx + ' ' + ly + ')">' + r.title + (done ? ' \u2713' : '') + '</text>';
+    });
+    for(let i = 0; i < 24; i++){ const [x, y] = pt(137, i * 15); s += '<rect x="' + (x - 3) + '" y="' + (y - 3) + '" width="6" height="6" rx="1.2" fill="rgba(236,234,246,.55)" transform="rotate(' + (i * 15) + ' ' + x + ' ' + y + ')"/>'; }
+    s += '<circle cx="150" cy="150" r="' + R_IN + '" fill="url(#hub)" stroke="rgba(139,108,255,.8)" stroke-width="2"/>';
+    for(let i = 0; i < 3; i++){ const [x, y] = pt(27, i * 120 + 30); s += '<circle cx="' + x + '" cy="' + y + '" r="8" fill="rgba(12,15,36,.9)" stroke="rgba(62,230,201,.5)" stroke-width="1"/>'; }
+    s += '<circle cx="150" cy="150" r="7" fill="#FFC46B"/>';
+    svg.innerHTML = s;
+  }
+  let rot = 0, spinning = false;
+  function setHint(html){ $('stageHint').innerHTML = html; }
+  function spin(){
+    if(spinning) return;
+    const candidates = REELS.map((r, i) => ({ r, i })).filter(o => !reelDone(o.r.id));
+    if(!candidates.length){ setHint('Every reel is kept. Take it out of the booth below.'); return; }
+    let pool = candidates.filter(o => o.r.id !== currentReel); if(!pool.length) pool = candidates;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    const jitter = (Math.random() - .5) * 34;
+    const target = ((-pick.i * 60 - rot) % 360 + 360) % 360;
+    const delta = 360 * (4 + Math.floor(Math.random() * 3)) + target + jitter;
+    const D = reduceMotion ? 1300 : 3400;
+    spinning = true; $('btnSpin').disabled = true;
+    if(viewAll) showAll(false);
+    $('chosen').classList.add('hidden');
+    setHint('Rolling\u2026');
+    spinSound(rot, delta, D);
+    const start = performance.now(), from = rot, reel = $('reel');
+    function frame(now){
+      const x = Math.min(1, (now - start) / D), e = 1 - Math.pow(1 - x, 5);
+      rot = from + delta * e;
+      reel.style.transform = 'rotate(' + rot + 'deg)';
+      if(x < 1) requestAnimationFrame(frame); else land(pick);
+    }
+    requestAnimationFrame(frame);
+  }
+  function land(pick){
+    rot = ((rot % 360) + 360) % 360;
+    $('reel').style.transform = 'rotate(' + rot + 'deg)';
+    spinning = false; $('btnSpin').disabled = false; $('btnSpin').textContent = 'Spin again';
+    spark($('pointer'), true);
+    const seg = document.getElementById('seg-' + pick.r.id); if(seg) seg.setAttribute('fill', 'rgba(255,196,107,.34)');
+    currentReel = pick.r.id;
+    const n = REELS.indexOf(pick.r) + 1;
+    setHint('Reel ' + n + ' of 6: <b>' + pick.r.title + '</b>');
+    renderChosen(pick.r);
+    setTimeout(() => { $('chosen').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block:'start' }); }, 350);
+  }
+
+  /* ---------- question rows ---------- */
+  function grow(el){ el.style.height = 'auto'; el.style.height = Math.max(96, el.scrollHeight) + 'px'; }
+  function buildRow(q){
+    const idx = QUESTIONS.indexOf(q) + 1;
+    const row = document.createElement('div'); row.className = 'q' + (answered(q.id) ? ' answered' : ''); row.id = 'row-' + q.id;
+    const num = document.createElement('div'); num.className = 'q-num'; num.textContent = idx;
+    const textWrap = document.createElement('div');
+    const label = document.createElement('label'); label.className = 'q-text'; label.setAttribute('for', 'ta-' + q.id); label.textContent = q.text; textWrap.appendChild(label);
+    if(q.hint){ const h = document.createElement('p'); h.className = 'q-hint'; h.textContent = q.hint; textWrap.appendChild(h); }
+    const ta = document.createElement('textarea'); ta.id = 'ta-' + q.id; ta.rows = 3; ta.placeholder = 'Write here'; ta.value = state.answers[q.id] || '';
+    ta.addEventListener('input', () => { state.answers[q.id] = ta.value; grow(ta); updateCounts(); refreshKeepButtons(); scheduleSave(); });
+    const foot = document.createElement('div'); foot.className = 'q-foot';
+    const btn = document.createElement('button'); btn.className = 'keep'; btn.type = 'button'; btn.id = 'keep-' + q.id; btn.textContent = 'Save';
+    btn.addEventListener('click', () => keep(q));
+    const at = document.createElement('span'); at.className = 'kept-at'; at.id = 'at-' + q.id;
+    foot.appendChild(btn); foot.appendChild(at);
+    row.appendChild(num); row.appendChild(textWrap); row.appendChild(ta); row.appendChild(foot);
+    return row;
+  }
   function refreshKeepButtons(){
     QUESTIONS.forEach(q => {
-      const btn = $('keep-' + q.id), at = $('at-' + q.id);
-      if(!btn) return;
-      const cur = state.answers[q.id] || '';
-      const clean = cur === (savedValues[q.id] || '');
+      const btn = $('keep-' + q.id), at = $('at-' + q.id); if(!btn) return;
+      const cur = state.answers[q.id] || '', clean = cur === (savedValues[q.id] || '');
       btn.disabled = cur.trim().length === 0;
-      if(clean && cur.trim().length > 0){ btn.textContent = 'Saved \u2726'; btn.classList.add('kept'); }
-      else { btn.textContent = 'Save'; btn.classList.remove('kept'); }
+      if(clean && cur.trim().length > 0){ btn.textContent = 'Saved \u2726'; btn.classList.add('kept'); } else { btn.textContent = 'Save'; btn.classList.remove('kept'); }
       at.textContent = state.kept[q.id] ? 'Kept ' + fmtTime(state.kept[q.id]) : '';
     });
   }
-
-  function updateCounts(){
-    const n = answeredCount();
-    $('topCount').textContent = n + ' of ' + QUESTIONS.length + ' kept';
-    $('progressBar').style.width = Math.round(100 * n / QUESTIONS.length) + '%';
-    REELS.forEach(r => {
-      const qs = reelQs(r.id), done = qs.filter(q => answered(q.id)).length;
-      const el = $('count-' + r.id);
-      el.textContent = done + ' of ' + qs.length;
-      el.className = 'count' + (done === qs.length ? ' done' : '');
-    });
-    QUESTIONS.forEach(q => $('row-' + q.id).classList.toggle('answered', answered(q.id)));
-    checkFin();
-  }
-
-  function checkFin(){
-    const complete = answeredCount() === QUESTIONS.length && state.exported;
-    $('fin').classList.toggle('hidden', !complete);
-    if(complete){ $('topCount').textContent = 'All ' + QUESTIONS.length + ' kept and exported'; }
-  }
-
-  function toggleReel(rid, force){
-    const reel = $('reel-' + rid);
-    const open = typeof force === 'boolean' ? force : !reel.classList.contains('open');
-    reel.classList.toggle('open', open);
-    reel.querySelector('.reel-head').setAttribute('aria-expanded', String(open));
-    if(open){ reelQs(rid).forEach(q => grow($('ta-' + q.id))); }
-  }
-
   async function keep(q){
     const ta = $('ta-' + q.id), btn = $('keep-' + q.id);
     state.answers[q.id] = ta.value;
     state.kept[q.id] = new Date().toISOString();
     clearTimeout(saveTimer);
-    spark(btn);
-    ta.classList.add('flash');
-    setTimeout(() => ta.classList.remove('flash'), 900);
-    await save();
+    spark(btn, false); keepSound();
+    ta.classList.add('flash'); setTimeout(() => ta.classList.remove('flash'), 900);
+    const reel = REELS.find(r => r.id === q.r);
+    await save([{ type:'keep', q: QUESTIONS.indexOf(q) + 1, section: reel.title, at: state.kept[q.id], progress: progressSummary() }]);
+    updateCounts();
   }
 
-  function render(){
-    const root = $('reels');
-    root.innerHTML = '';
+  function renderChosen(r){
+    const host = $('chosen'); host.innerHTML = ''; $('allReels').innerHTML = '';
+    const qs = reelQs(r.id), done = qs.filter(q => answered(q.id)).length;
+    const head = document.createElement('div'); head.className = 'chosen-head';
+    head.innerHTML = '<p class="chosen-kicker">Reel ' + (REELS.indexOf(r) + 1) + ' of 6, ' + done + ' of ' + qs.length + ' kept</p><h2 class="reel-title">' + r.title + '</h2><p class="reel-epi">' + r.epi + '</p>';
+    const body = document.createElement('div'); body.className = 'chosen-body';
+    qs.forEach(q => body.appendChild(buildRow(q)));
+    const foot = document.createElement('div'); foot.className = 'chosen-foot';
+    const again = document.createElement('button'); again.className = 'btn'; again.textContent = 'Spin for the next reel';
+    again.addEventListener('click', () => { $('stage').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block:'center' }); setTimeout(spin, 450); });
+    foot.appendChild(again); body.appendChild(foot);
+    host.appendChild(head); host.appendChild(body);
+    host.classList.remove('hidden');
+    qs.forEach(q => grow($('ta-' + q.id)));
+    refreshKeepButtons();
+  }
+
+  function renderAll(){
+    const root = $('allReels'); root.innerHTML = ''; $('chosen').innerHTML = ''; $('chosen').classList.add('hidden');
     REELS.forEach(r => {
-      const reel = document.createElement('section');
-      reel.className = 'reel'; reel.id = 'reel-' + r.id;
-
-      const head = document.createElement('button');
-      head.className = 'reel-head'; head.type = 'button';
-      head.setAttribute('aria-expanded', 'false');
-      head.setAttribute('aria-controls', 'body-' + r.id);
-      head.innerHTML =
-        '<span><h2 class="reel-title">' + r.title + '</h2><p class="reel-epi">' + r.epi + '</p></span>' +
-        '<span class="reel-meta"><span class="count" id="count-' + r.id + '"></span>' +
-        '<svg class="chev" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 7.5l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+      const reel = document.createElement('section'); reel.className = 'reel'; reel.id = 'reel-' + r.id;
+      const head = document.createElement('button'); head.className = 'reel-head'; head.type = 'button'; head.setAttribute('aria-expanded', 'false');
+      head.innerHTML = '<span><h2 class="reel-title">' + r.title + '</h2><p class="reel-epi">' + r.epi + '</p></span>' +
+        '<span class="reel-meta"><span class="count" id="count-' + r.id + '"></span><svg class="chev" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 7.5l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
       head.addEventListener('click', () => toggleReel(r.id));
-
-      const body = document.createElement('div');
-      body.className = 'reel-body'; body.id = 'body-' + r.id;
-
-      reelQs(r.id).forEach(q => {
-        const idx = QUESTIONS.indexOf(q) + 1;
-        const row = document.createElement('div');
-        row.className = 'q'; row.id = 'row-' + q.id;
-
-        const num = document.createElement('div');
-        num.className = 'q-num'; num.textContent = idx;
-
-        const textWrap = document.createElement('div');
-        const label = document.createElement('label');
-        label.className = 'q-text'; label.setAttribute('for', 'ta-' + q.id); label.textContent = q.text;
-        textWrap.appendChild(label);
-        if(q.hint){ const h = document.createElement('p'); h.className = 'q-hint'; h.textContent = q.hint; textWrap.appendChild(h); }
-
-        const ta = document.createElement('textarea');
-        ta.id = 'ta-' + q.id; ta.rows = 3; ta.placeholder = 'Write here';
-        ta.value = state.answers[q.id] || '';
-        ta.addEventListener('input', () => {
-          state.answers[q.id] = ta.value;
-          grow(ta); updateCounts(); refreshKeepButtons(); scheduleSave();
-        });
-
-        const foot = document.createElement('div');
-        foot.className = 'q-foot';
-        const btn = document.createElement('button');
-        btn.className = 'keep'; btn.type = 'button'; btn.id = 'keep-' + q.id; btn.textContent = 'Save';
-        btn.addEventListener('click', () => keep(q));
-        const at = document.createElement('span');
-        at.className = 'kept-at'; at.id = 'at-' + q.id;
-        foot.appendChild(btn); foot.appendChild(at);
-
-        row.appendChild(num); row.appendChild(textWrap); row.appendChild(ta); row.appendChild(foot);
-        body.appendChild(row);
-      });
-
+      const body = document.createElement('div'); body.className = 'reel-body';
+      reelQs(r.id).forEach(q => body.appendChild(buildRow(q)));
       reel.appendChild(head); reel.appendChild(body); root.appendChild(reel);
     });
-
-    const nameInput = $('nameInput');
-    nameInput.value = state.name || '';
-    nameInput.addEventListener('input', () => { state.name = nameInput.value; scheduleSave(); });
-    nameInput.addEventListener('blur', flush);
-
-    updateCounts();
-    refreshKeepButtons();
-    const firstOpen = REELS.find(r => reelQs(r.id).some(q => !answered(q.id))) || REELS[0];
+    root.classList.remove('hidden');
+    updateCounts(); refreshKeepButtons();
+    const firstOpen = REELS.find(r => !reelDone(r.id)) || REELS[0];
     toggleReel(firstOpen.id, true);
-    if(state.updatedAt) lastSavedEl.textContent = 'Last saved ' + fmtTime(state.updatedAt);
+  }
+  function toggleReel(rid, force){
+    const reel = $('reel-' + rid); if(!reel) return;
+    const open = typeof force === 'boolean' ? force : !reel.classList.contains('open');
+    reel.classList.toggle('open', open);
+    reel.querySelector('.reel-head').setAttribute('aria-expanded', String(open));
+    if(open){ reelQs(rid).forEach(q => grow($('ta-' + q.id))); }
+  }
+  function showAll(on){
+    viewAll = on;
+    $('btnAll').textContent = on ? 'Back to the reel' : 'Show everything';
+    if(on){ renderAll(); setTimeout(() => $('allReels').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block:'start' }), 80); }
+    else { $('allReels').classList.add('hidden'); $('allReels').innerHTML = ''; if(currentReel){ renderChosen(REELS.find(r => r.id === currentReel)); } }
+  }
+
+  /* ---------- counts / greeting / fin ---------- */
+  function updateCounts(){
+    const n = answeredCount();
+    $('topCount').textContent = n + ' of ' + QUESTIONS.length + ' kept';
+    $('progressBar').style.width = Math.round(100 * n / QUESTIONS.length) + '%';
+    REELS.forEach(r => {
+      const el = $('count-' + r.id); if(!el) return;
+      const qs = reelQs(r.id), done = qs.filter(q => answered(q.id)).length;
+      el.textContent = done + ' of ' + qs.length; el.className = 'count' + (done === qs.length ? ' done' : '');
+    });
+    QUESTIONS.forEach(q => { const row = $('row-' + q.id); if(row) row.classList.toggle('answered', answered(q.id)); });
+    drawReel();
+    if(currentReel){ const seg = document.getElementById('seg-' + currentReel); if(seg && !reelDone(currentReel)) seg.setAttribute('fill', 'rgba(255,196,107,.34)'); }
+    checkFin();
+  }
+  function checkFin(){
+    const complete = answeredCount() === QUESTIONS.length && state.exported;
+    $('fin').classList.toggle('hidden', !complete);
+    if(complete) $('topCount').textContent = 'All ' + QUESTIONS.length + ' kept and exported';
+  }
+  function greet(){
+    const n = answeredCount();
+    let name, line, sub;
+    if(n === 0){
+      name = NAME + ',';
+      line = 'the projector is warm.';
+      sub = 'Eighteen questions on six reels. No order, no rush. Spin, answer what you can, and every word is kept for next time.';
+    } else if(n < QUESTIONS.length){
+      name = 'Welcome back, ' + NAME + '.';
+      line = 'The reel is where you left it.';
+      sub = n + ' of ' + QUESTIONS.length + ' kept' + (state.updatedAt ? ', last saved ' + fmtTime(state.updatedAt) : '') + '. Spin for the next one.';
+    } else {
+      name = NAME + ',';
+      line = 'every reel is kept.';
+      sub = 'Take it out of the booth below, and the plan begins.';
+    }
+    $('greetName').textContent = name;
+    $('greetLine').innerHTML = line.split(' ').map((w, i) => '<span class="w" style="--dl:' + (0.35 + i * 0.14) + 's">' + w + '</span>').join(' ');
+    $('greetSub').textContent = sub;
   }
 
   /* ---------- export ---------- */
   function exportDateLine(){ return new Date().toLocaleDateString([], {day:'numeric', month:'long', year:'numeric'}); }
   function plainText(){
-    const L = [];
-    L.push('LIFE PLAN INTAKE');
-    if(state.name.trim()) L.push('Name: ' + state.name.trim());
-    L.push('Exported: ' + exportDateLine());
-    L.push('Answered: ' + answeredCount() + ' of ' + QUESTIONS.length);
-    L.push('');
+    const L = ['LIFE PLAN INTAKE', 'Name: ' + NAME, 'Exported: ' + exportDateLine(), 'Answered: ' + answeredCount() + ' of ' + QUESTIONS.length, ''];
     REELS.forEach(r => {
       L.push('== ' + r.title.toUpperCase() + ' =='); L.push('');
-      reelQs(r.id).forEach(q => {
-        L.push((QUESTIONS.indexOf(q) + 1) + '. ' + q.text);
-        const a = (state.answers[q.id] || '').trim();
-        L.push(a ? a : '[Not answered]'); L.push('');
-      });
+      reelQs(r.id).forEach(q => { L.push((QUESTIONS.indexOf(q) + 1) + '. ' + q.text); const a = (state.answers[q.id] || '').trim(); L.push(a ? a : '[Not answered]'); L.push(''); });
     });
     return L.join('\n');
   }
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
   function download(blob, filename){
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = filename;
-    document.body.appendChild(a); a.click();
-    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
   }
-  function fileStem(){
-    const n = state.name.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-    return 'life-plan-intake' + (n ? '-' + n : '');
-  }
-  function note(id, msg, ok){
-    const el = $(id); el.textContent = msg;
-    el.className = 'note' + (ok ? ' ok' : '') + (msg ? '' : ' hidden');
-  }
-  function markExported(){
-    if(!state.exported){ state.exported = true; save(); }
+  function note(msg, ok){ const el = $('exportNote'); el.textContent = msg; el.className = 'note' + (ok ? ' ok' : '') + (msg ? '' : ' hidden'); }
+  function markExported(kind){
+    state.exported = true;
+    save([{ type:'export', kind, at: new Date().toISOString(), progress: progressSummary() }]);
     checkFin();
   }
-
   function exportDoc(){
     let body = '<h1 style="font-family:Georgia,serif;font-size:22pt;margin:0 0 6pt">Life plan intake</h1>';
-    body += '<p style="font-family:Arial,sans-serif;font-size:10pt;color:#555;margin:0 0 18pt">' +
-      (state.name.trim() ? esc(state.name.trim()) + ' &middot; ' : '') + exportDateLine() +
-      ' &middot; ' + answeredCount() + ' of ' + QUESTIONS.length + ' answered</p>';
+    body += '<p style="font-family:Arial,sans-serif;font-size:10pt;color:#555;margin:0 0 18pt">' + NAME + ' &middot; ' + exportDateLine() + ' &middot; ' + answeredCount() + ' of ' + QUESTIONS.length + ' answered</p>';
     REELS.forEach(r => {
       body += '<h2 style="font-family:Georgia,serif;font-size:15pt;margin:20pt 0 8pt;border-bottom:1px solid #999;padding-bottom:3pt">' + esc(r.title) + '</h2>';
       reelQs(r.id).forEach(q => {
@@ -669,138 +778,83 @@
         body += '<p style="font-family:Georgia,serif;font-size:11pt;margin:0 0 6pt 18pt;' + (a ? '' : 'color:#999;font-style:italic') + '">' + (a ? esc(a) : 'Not answered') + '</p>';
       });
     });
-    const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
-      '<head><meta charset="utf-8"><title>Life plan intake</title>' +
-      '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->' +
-      '</head><body style="margin:1in">' + body + '</body></html>';
-    download(new Blob(['\ufeff', html], {type:'application/msword'}), fileStem() + '.doc');
-    note('exportNote', 'Word file downloaded. It opens in Word, Google Docs and Pages.', true);
-    markExported();
+    const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>Life plan intake</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]--></head><body style="margin:1in">' + body + '</body></html>';
+    download(new Blob(['\ufeff', html], {type:'application/msword'}), 'life-plan-intake-hari.doc');
+    note('Word file downloaded. It opens in Word, Google Docs and Pages.', true);
+    markExported('word');
   }
-
   function pdfSafe(s){ return String(s).replace(/\u20B9/g, 'Rs. ').replace(/[\u2028\u2029]/g, ' '); }
   function exportPdf(){
-    if(!window.jspdf || !window.jspdf.jsPDF){
-      note('exportNote', 'The PDF tool did not load here. Use Download Word or Copy as text instead.');
-      return;
-    }
+    if(!window.jspdf || !window.jspdf.jsPDF){ note('The PDF tool did not load here. Use Download Word or Copy as text instead.'); return; }
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit:'pt', format:'a4' });
-    const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
-    const M = 56, maxW = W - M * 2;
+    const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight(), M = 56, maxW = W - M * 2;
     let y = M;
     function ensure(h){ if(y + h > H - M){ doc.addPage(); y = M; } }
     function text(str, size, style, color, indent, gapAfter){
       doc.setFont('helvetica', style || 'normal'); doc.setFontSize(size); doc.setTextColor(color || 30);
-      const lines = doc.splitTextToSize(pdfSafe(str), maxW - (indent || 0));
-      const lh = size * 1.35;
+      const lines = doc.splitTextToSize(pdfSafe(str), maxW - (indent || 0)), lh = size * 1.35;
       lines.forEach(line => { ensure(lh); doc.text(line, M + (indent || 0), y); y += lh; });
       y += (gapAfter || 0);
     }
     text('Life plan intake', 20, 'bold', 20, 0, 4);
-    text((state.name.trim() ? state.name.trim() + '  |  ' : '') + exportDateLine() + '  |  ' + answeredCount() + ' of ' + QUESTIONS.length + ' answered', 9.5, 'normal', 110, 0, 14);
+    text(NAME + '  |  ' + exportDateLine() + '  |  ' + answeredCount() + ' of ' + QUESTIONS.length + ' answered', 9.5, 'normal', 110, 0, 14);
     REELS.forEach(r => {
-      ensure(40); y += 6;
-      text(r.title, 14, 'bold', 20, 0, 2);
+      ensure(40); y += 6; text(r.title, 14, 'bold', 20, 0, 2);
       doc.setDrawColor(160); doc.line(M, y - 6, W - M, y - 6); y += 6;
       reelQs(r.id).forEach(q => {
         const a = (state.answers[q.id] || '').trim();
         text((QUESTIONS.indexOf(q) + 1) + '. ' + q.text, 10.5, 'bold', 30, 0, 2);
-        if(a){ text(a, 10.5, 'normal', 30, 16, 10); } else { text('Not answered', 10.5, 'italic', 150, 16, 10); }
+        if(a) text(a, 10.5, 'normal', 30, 16, 10); else text('Not answered', 10.5, 'italic', 150, 16, 10);
       });
     });
-    doc.save(fileStem() + '.pdf');
-    note('exportNote', 'PDF downloaded.', true);
-    markExported();
+    doc.save('life-plan-intake-hari.pdf');
+    note('PDF downloaded.', true);
+    markExported('pdf');
   }
-
   async function copyText(){
     const t = plainText();
-    try{
-      await navigator.clipboard.writeText(t);
-      note('exportNote', 'Copied. Paste it anywhere.', true);
-      $('copybox').classList.add('hidden');
-    }catch(e){
-      const area = $('copyArea');
-      area.value = t; $('copybox').classList.remove('hidden');
-      area.focus(); area.select();
-      note('exportNote', 'Select the text below and copy it.');
-    }
-    markExported();
+    try{ await navigator.clipboard.writeText(t); note('Copied. Paste it anywhere.', true); $('copybox').classList.add('hidden'); }
+    catch(e){ const area = $('copyArea'); area.value = t; $('copybox').classList.remove('hidden'); area.focus(); area.select(); note('Select the text below and copy it.'); }
+    markExported('copy');
   }
 
-  /* ---------- reminders ---------- */
-  function pad(n){ return String(n).padStart(2, '0'); }
-  function icsDate(d){ return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00'; }
-  function icsEvent(hour, minute, uidSuffix){
-    const start = new Date(); start.setHours(hour, minute, 0, 0);
-    if(start <= new Date()) start.setDate(start.getDate() + 1);
-    const stamp = new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z');
-    return [
-      'BEGIN:VEVENT',
-      'UID:intake-' + uidSuffix + '-' + Date.now() + '@lifeplan',
-      'DTSTAMP:' + stamp,
-      'DTSTART:' + icsDate(start),
-      'DURATION:PT15M',
-      'RRULE:FREQ=DAILY;COUNT=14',
-      'SUMMARY:Answer one intake question',
-      'DESCRIPTION:Open the Life plan intake in Claude and keep one more answer. Delete this reminder once all 18 are done.',
-      'BEGIN:VALARM','TRIGGER:PT0S','ACTION:DISPLAY','DESCRIPTION:Answer one intake question','END:VALARM',
-      'END:VEVENT'
-    ].join('\r\n');
-  }
-  function icsFile(events){
-    return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Life plan intake//EN','CALSCALE:GREGORIAN', ...events, 'END:VCALENDAR'].join('\r\n') + '\r\n';
-  }
-  function remind2h(){
-    const hours = [10,12,14,16,18,20,22];
-    download(new Blob([icsFile(hours.map((h,i) => icsEvent(h, 0, '2h-' + i)))], {type:'text/calendar'}), 'intake-reminders-every-2-hours.ics');
-    note('remindNote', 'Calendar file downloaded. Open it to add 7 daily alarms (10 am to 10 pm) for the next 14 days.', true);
-  }
-  function remindDaily(){
-    const v = ($('dailyTime').value || '21:00').split(':');
-    const h = parseInt(v[0], 10) || 21, m = parseInt(v[1], 10) || 0;
-    download(new Blob([icsFile([icsEvent(h, m, 'daily')])], {type:'text/calendar'}), 'intake-reminder-daily.ics');
-    note('remindNote', 'Calendar file downloaded. Open it to add a daily alarm for the next 14 days.', true);
-  }
-  function shareWa(){
-    const n = answeredCount();
-    const msg = 'Life plan intake: ' + n + ' of ' + QUESTIONS.length + ' answered' + (n === QUESTIONS.length ? '. All done, exporting now.' : '. Next one due today.');
-    const url = 'https://wa.me/?text=' + encodeURIComponent(msg);
-    const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener';
-    document.body.appendChild(a); a.click(); a.remove();
-    note('remindNote', 'If WhatsApp did not open, copy this: ' + msg);
-  }
-
-  /* ---------- reset (two-step, no popup) ---------- */
+  /* ---------- reset ---------- */
   let armTimer = null;
   async function resetAll(){
     const b = $('btnReset');
     if(!b.classList.contains('arm')){
       b.classList.add('arm'); b.textContent = 'Tap again to clear everything';
-      armTimer = setTimeout(() => { b.classList.remove('arm'); b.textContent = 'Clear all answers'; }, 4000);
-      return;
+      armTimer = setTimeout(() => { b.classList.remove('arm'); b.textContent = 'Clear all answers'; }, 4000); return;
     }
-    clearTimeout(armTimer);
-    b.classList.remove('arm'); b.textContent = 'Clear all answers';
-    state = { name:'', answers:{}, kept:{}, exported:false, updatedAt:null };
-    savedValues = {};
-    if(hasStorage){ try{ await window.storage.delete(KEY, false); }catch(e){} try{ await window.storage.delete(OLD_KEY, false); }catch(e){} }
-    $('welcome').classList.add('hidden'); lastSavedEl.textContent = '';
-    note('exportNote', ''); note('remindNote', '');
-    render();
-    setStatus(hasStorage ? 'Cleared' : 'Not saving', hasStorage ? 'saved' : 'error');
+    clearTimeout(armTimer); b.classList.remove('arm'); b.textContent = 'Clear all answers';
+    state = { name:NAME, answers:{}, kept:{}, exported:false, updatedAt:null };
+    savedValues = {}; currentReel = null; note('');
+    lastSavedEl.textContent = '';
+    $('chosen').classList.add('hidden'); $('chosen').innerHTML = '';
+    if(viewAll) renderAll();
+    setHint('Tap the reel. It picks tonight\u2019s questions for you.'); $('btnSpin').textContent = 'Spin the reel';
+    updateCounts(); greet();
+    await save([{ type:'reset', at: new Date().toISOString(), progress: progressSummary() }]);
   }
 
+  /* ---------- wire up ---------- */
+  $('reelBtn').addEventListener('click', spin);
+  $('btnSpin').addEventListener('click', spin);
+  $('btnAll').addEventListener('click', () => showAll(!viewAll));
+  $('btnSound').addEventListener('click', () => { setSound(!soundOn); if(soundOn) keepSound(); });
   $('btnPdf').addEventListener('click', exportPdf);
   $('btnDoc').addEventListener('click', exportDoc);
   $('btnCopy').addEventListener('click', copyText);
   $('btnReset').addEventListener('click', resetAll);
-  $('btnIcs2h').addEventListener('click', remind2h);
-  $('btnIcsDaily').addEventListener('click', remindDaily);
-  $('btnWa').addEventListener('click', shareWa);
 
-  (async function(){ await load(); render(); })();
+  (async function(){
+    try{ setSound(localStorage.getItem(SKEY) !== '0'); }catch(e){ setSound(true); }
+    drawReel();
+    await load();
+    updateCounts(); greet();
+    if(answeredCount() === QUESTIONS.length) setHint('Every reel is kept. Take it out of the booth below.');
+  })();
 })();
 </script>
 </body>
