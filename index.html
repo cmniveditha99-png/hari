@@ -84,9 +84,14 @@
   .film-glow{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
     background:linear-gradient(118deg,transparent 46%,rgba(255,214,150,.08) 52%,transparent 60%),
                radial-gradient(120% 90% at 50% 100%,transparent 55%,rgba(12,15,36,.55) 100%)}
-  .pill{position:absolute;left:50%;bottom:max(30px,env(safe-area-inset-bottom));transform:translateX(-50%);border:1px solid rgba(255,196,107,.5);
-    background:rgba(12,15,36,.55);color:var(--amber);padding:10px 18px;border-radius:999px;font-size:14px;
-    backdrop-filter:blur(8px);box-shadow:0 0 16px rgba(255,196,107,.35);animation:fadeIn 1s ease .6s both}
+  .play{position:absolute;left:50%;top:50%;width:92px;height:92px;margin:-46px 0 0 -46px;border-radius:50%;
+    border:1px solid rgba(255,196,107,.6);background:rgba(12,15,36,.45);color:var(--amber);
+    display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    box-shadow:0 0 30px rgba(255,196,107,.35),inset 0 0 18px rgba(255,196,107,.12);
+    animation:fadeIn 1.4s ease .5s both,breathe 3.4s ease-in-out 2s infinite;transition:transform .3s,opacity .6s}
+  .play svg{width:38px;height:38px;margin-left:4px}
+  .play:hover{transform:scale(1.05)}
+  .play.gone{opacity:0;transform:scale(1.3);pointer-events:none;animation:none}
   .skip{position:fixed;top:18px;right:20px;z-index:26;background:none;border:0;color:var(--faint);font-family:var(--serif);font-style:italic;font-size:16px;letter-spacing:.02em;opacity:0;transition:opacity 1s}
   .skip.show{opacity:1}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -106,7 +111,9 @@
     animation:shimmer 9s linear infinite;filter:drop-shadow(0 0 18px rgba(139,108,255,.45))}
   @keyframes shimmer{from{background-position:0% 50%}to{background-position:300% 50%}}
   .line{font-size:24px;line-height:1.35;font-style:italic;margin:0 0 12px;color:var(--text)}
-  .sub{font-size:19px;line-height:1.5;color:var(--muted);margin:0;max-width:30em}
+  .sub{font-size:19px;line-height:1.55;color:var(--muted);margin:0;max-width:30em}
+  .sub .para{display:block;margin-top:10px}
+  .sub .para:last-child{color:var(--text);font-style:italic;margin-top:16px}
   .w{display:inline-block;opacity:0;animation:wordIn .9s ease forwards;animation-delay:var(--dl)}
   @keyframes wordIn{from{opacity:0;transform:translateY(5px);filter:blur(5px);text-shadow:0 0 18px rgba(62,230,201,.9)}to{opacity:1;transform:none;filter:none;text-shadow:none}}
   .quote{font-size:25px;line-height:1.4;font-style:italic;margin:26px 0 8px;color:var(--text);text-shadow:0 0 22px rgba(139,108,255,.35)}
@@ -141,7 +148,9 @@
   .kicker{font-family:var(--sans);font-size:13px;color:var(--amber);margin:0 0 4px}
   .chosen-body{padding:6px 18px 6px;border:1px solid var(--line);border-top:0;border-radius:0 0 16px 16px;background:rgba(12,15,36,.45);backdrop-filter:blur(6px)}
   .reel-title{font-size:30px;font-weight:400;margin:0 0 4px;line-height:1.15;font-style:italic}
-  .reel-epi{font-style:italic;font-size:17px;color:var(--muted);margin:0 0 10px;max-width:30em;line-height:1.45}
+  .reel-epi{font-style:italic;font-size:17px;color:var(--muted);margin:2px 0 12px;max-width:30em;line-height:1.5}
+  .film-ref{font-style:normal;color:var(--amber);letter-spacing:.02em;text-shadow:0 0 10px rgba(255,196,107,.35)}
+  .tail{display:block;margin-top:4px;color:var(--text)}
   .chosen-foot{display:flex;justify-content:center;gap:10px;padding:8px 0 18px;flex-wrap:wrap}
   .reel{border-top:1px solid var(--line);margin-top:18px;position:relative}
   .reel:last-of-type{border-bottom:1px solid var(--line)}
@@ -216,10 +225,9 @@
 <!-- Scene 0: the intro film -->
 <section class="scene" id="s0">
   <div class="film">
-      <video id="intro" src="https://pub-82685fc555b34cba8e83292785f0d6b7.r2.dev/hari_intro.mp4" autoplay playsinline preload="auto"></video>
+      <video id="intro" src="https://pub-82685fc555b34cba8e83292785f0d6b7.r2.dev/hari_intro.mp4" playsinline preload="auto"></video>
       <div class="film-glow" aria-hidden="true"></div>
-      <button class="pill hidden" id="unmute">♪ tap for sound</button>
-      <button class="pill hidden" id="playBtn">▶ begin</button>
+      <button class="play" id="playBtn" aria-label="Play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></button>
   </div>
 </section>
 <button class="skip" id="skip">skip →</button>
@@ -288,19 +296,21 @@
 <button class="nav next" id="navNext" aria-label="Continue"><svg viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 
 <audio id="reelAudio" src="reel_sound.mp3" preload="auto"></audio>
+<audio id="bgm" src="https://pub-82685fc555b34cba8e83292785f0d6b7.r2.dev/Love%20Story%20by%20Richard%20Clayderman.mp3" preload="auto" loop></audio>
 <div class="sparks" id="sparks" aria-hidden="true"></div>
 
 <script>
 (function(){
   const NAME = 'Hari';
   const REELS = [
-    { id:'daily',  title:'Daily reality', short:'Days',   epi:'Before anything can change, I need the day exactly as it repeats.' },
-    { id:'work',   title:'Work',          short:'Work',   epi:'The beautiful mess of making the work. Show me yours.' },
-    { id:'money',  title:'Money',         short:'Money',  epi:'The ledger is the dullest part of a life, and it still has to balance.' },
-    { id:'health', title:'Health',        short:'Health', epi:'The montage is the part they cut. This is the part they cut.' },
-    { id:'mind',   title:'Psychology',    short:'Mind',   epi:'What you notice when you finally sit still and look.' },
-    { id:'vision', title:'Vision',        short:'Vision', epi:'Where are you going, and who is waiting for the thing only you would make?' }
+    { id:'daily',  title:'Daily reality', short:'Days',   film:'Groundhog Day, 1993.',        epi:'Before anything can change, I need the day exactly as it repeats.', tail:'' },
+    { id:'work',   title:'Work',          short:'Work',   film:'Day for Night, 1973.',         epi:'A film about the beautiful mess of making a film.', tail:'Show me yours.' },
+    { id:'money',  title:'Money',         short:'Money',  film:'It\u2019s a Wonderful Life, 1946.', epi:'The ledger is the dullest part of a life, and it still has to balance.', tail:'' },
+    { id:'health', title:'Health',        short:'Health', film:'Rocky, 1976.',                 epi:'The montage is the part they cut.', tail:'This is the part they cut.' },
+    { id:'mind',   title:'Psychology',    short:'Mind',   film:'Rear Window, 1954.',           epi:'What you notice when you finally sit still and look.', tail:'' },
+    { id:'vision', title:'Vision',        short:'Vision', film:'Cinema Paradiso, 1988.',       epi:'Alfredo sent Tot\u00F2 away so he\u2019d become someone.', tail:'Where are you going?' }
   ];
+  function epiHtml(r){ return '<p class="reel-epi"><span class="film-ref">' + r.film + '</span> ' + r.epi + (r.tail ? '<em class="tail">' + r.tail + '</em>' : '') + '</p>'; }
   const QUESTIONS = [
     { id:'q1', r:'daily', text:'Walk me through a typical weekday hour by hour: wake time, first thing you do, when work happens, meals, screen time, bedtime. Then a typical day off.', hint:'Two rough timelines, one for a work day and one for a day off.' },
     { id:'q2', r:'daily', text:'When do you first smoke each day, how many sessions, and what usually triggers each one (boredom, anxiety, habit, social, sleep)? Have you ever gone 3+ days without it, and what happened?' },
@@ -419,6 +429,19 @@
     let v = reelAudio.volume, steps = 0;
     const iv = setInterval(() => { v = Math.max(0, v - 0.12); reelAudio.volume = v; if(v <= 0 || ++steps > 12){ clearInterval(iv); reelAudio.pause(); reelAudio.volume = 1; } }, 40);
   }
+  const bgm = $('bgm'); let bgmFade = null;
+  const BGM_LEVEL = 0.16;
+  function startBgm(){
+    if(!soundOn) return;
+    clearInterval(bgmFade);
+    try{ bgm.volume = 0; bgm.currentTime = 0; const p = bgm.play(); if(p && p.catch) p.catch(() => {}); }catch(e){ return; }
+    bgmFade = setInterval(() => { bgm.volume = Math.min(BGM_LEVEL, bgm.volume + 0.01); if(bgm.volume >= BGM_LEVEL) clearInterval(bgmFade); }, 120);
+  }
+  function stopBgm(){
+    if(bgm.paused) return;
+    clearInterval(bgmFade);
+    bgmFade = setInterval(() => { bgm.volume = Math.max(0, bgm.volume - 0.02); if(bgm.volume <= 0){ clearInterval(bgmFade); bgm.pause(); } }, 60);
+  }
   function setSound(on){
     soundOn = on; try{ localStorage.setItem(SKEY, on ? '1' : '0'); }catch(e){}
     const b = $('btnSound'); b.setAttribute('aria-pressed', String(on)); b.setAttribute('aria-label', on ? 'Sound on' : 'Sound off'); b.textContent = on ? '\u266A' : '\u00B7';
@@ -471,7 +494,8 @@
     const video = $('intro');
     if(i === 0){ startIntro(); }
     else { try{ video.pause(); }catch(e){} }
-    if(i === 1){ greet(); const words = $('greetSub').querySelectorAll('.w').length; setTimeout(() => showNav(true, true), reduceMotion ? 300 : 1200 + words * 140 + 600); }
+    if(i === 1){ greet(); const words = $('greetSub').querySelectorAll('.w').length + $('greetLine').querySelectorAll('.w').length; setTimeout(() => showNav(true, true), reduceMotion ? 300 : 1400 + words * 130 + 900); startBgm(); }
+    else { stopBgm(); }
     if(i === 2){ $('reel').classList.add('idle'); setTimeout(() => showNav(!!currentReel || viewAll, true), 900); }
     if(i === 3){ if(viewAll) renderAll(); else if(currentReel) renderChosen(REELS.find(r => r.id === currentReel)); else renderAll(); setTimeout(() => showNav(true, true), 700); }
     if(i === 4){ $('closingLine').innerHTML = CLOSING.split(' ').map((w, k) => '<span class="w" style="--dl:' + (1.2 + k * 0.11) + 's">' + w + '</span>').join(' '); setTimeout(() => showNav(false, true), 900); }
@@ -479,40 +503,39 @@
   $('navNext').addEventListener('click', () => { if(scene < 4) go(scene + 1); });
   $('navBack').addEventListener('click', () => { if(scene > 0) go(scene - 1); });
 
-  /* intro film */
+  /* intro film: nothing plays until he taps, so no sound is missed */
   function startIntro(){
     const v = $('intro'), returning = answeredCount() > 0;
-    $('unmute').classList.add('hidden'); $('playBtn').classList.add('hidden');
-    v.currentTime = 0; v.muted = false;
-    const p = v.play();
-    if(p && p.catch){
-      p.catch(() => {
-        v.muted = true;
-        const p2 = v.play();
-        if(p2 && p2.catch) p2.catch(() => { $('playBtn').classList.remove('hidden'); });
-        if(p2 && p2.then) p2.then(() => $('unmute').classList.remove('hidden')).catch(() => {});
-      });
-    }
+    try{ v.pause(); v.currentTime = 0; }catch(e){}
+    v.muted = false;
+    $('playBtn').classList.remove('gone');
     if(returning) setTimeout(() => { if(scene === 0) $('skip').classList.add('show'); }, 4000);
   }
-  $('unmute').addEventListener('click', () => { const v = $('intro'); v.muted = false; $('unmute').classList.add('hidden'); });
-  $('playBtn').addEventListener('click', () => { const v = $('intro'); v.muted = false; v.play().catch(() => {}); $('playBtn').classList.add('hidden'); });
-  $('intro').addEventListener('ended', () => { if(scene === 0){ $('unmute').classList.add('hidden'); showNav(true, false); } });
+  $('playBtn').addEventListener('click', () => {
+    const v = $('intro'); v.muted = false;
+    ensureAudio();
+    const p = v.play(); if(p && p.catch) p.catch(() => {});
+    $('playBtn').classList.add('gone');
+  });
+  $('intro').addEventListener('ended', () => { if(scene === 0) showNav(true, false); });
   $('intro').addEventListener('error', () => { if(scene === 0) showNav(true, false); });
   $('skip').addEventListener('click', () => go(1));
 
-  /* greeting */
+  /* greeting: a fixed note, revealed word by word */
+  const NOTE = [
+    'you have it in you.',
+    'If the two years of planning start here, start them.',
+    'I can then flaunt that I once matched with him on Bumble.',
+    'Humans are selfish for survival, after all. You taught me that \u{1F31A}'
+  ];
   function greet(){
     if(greeted) return; greeted = true;
-    const n = answeredCount();
-    let name, line, sub;
-    if(n === 0){ name = NAME + ','; line = 'the projector is warm.'; sub = 'Eighteen questions on six reels. No order, no rush. Spin, answer what you can, and every word is kept for next time.'; }
-    else if(n < QUESTIONS.length){ name = 'Welcome back, ' + NAME + '.'; line = 'The reel is where you left it.'; sub = n + ' of ' + QUESTIONS.length + ' kept' + (state.updatedAt ? ', last saved ' + fmtTime(state.updatedAt) : '') + '. Spin for the next one.'; }
-    else { name = NAME + ','; line = 'every reel is kept.'; sub = 'Take it out of the booth, and the plan begins.'; }
-    $('greetName').textContent = name;
+    $('greetName').textContent = NAME + ',';
     let k = 0;
-    $('greetLine').innerHTML = line.split(' ').map(w => '<span class="w" style="--dl:' + (1.4 + (k++) * 0.16) + 's">' + w + '</span>').join(' ');
-    $('greetSub').innerHTML = sub.split(' ').map(w => '<span class="w" style="--dl:' + (1.4 + (k++) * 0.11) + 's">' + w + '</span>').join(' ');
+    const wrap = (txt, step) => txt.split(' ').map(w => '<span class="w" style="--dl:' + (1.4 + (k++) * step).toFixed(2) + 's">' + w + '</span>').join(' ');
+    $('greetLine').innerHTML = wrap(NOTE[0], 0.18);
+    $('greetSub').innerHTML = NOTE.slice(1).map(p => '<span class="para">' + wrap(p, 0.12) + '</span>').join('');
+    return k;
   }
 
   /* ---------- the reel ---------- */
@@ -638,7 +661,7 @@
     const host = $('chosen'); host.innerHTML = ''; host.classList.remove('hidden'); $('allReels').classList.add('hidden'); $('allReels').innerHTML = '';
     const qs = reelQs(r.id), done = qs.filter(q => answered(q.id)).length;
     const head = document.createElement('div'); head.className = 'chosen-head';
-    head.innerHTML = '<p class="kicker">Reel ' + (REELS.indexOf(r) + 1) + ' of 6, ' + done + ' of ' + qs.length + ' kept</p><h2 class="reel-title">' + r.title + '</h2><p class="reel-epi">' + r.epi + '</p>';
+    head.innerHTML = '<p class="kicker">Reel ' + (REELS.indexOf(r) + 1) + ' of 6, ' + done + ' of ' + qs.length + ' kept</p><h2 class="reel-title">' + r.title + '</h2>' + epiHtml(r);
     const body = document.createElement('div'); body.className = 'chosen-body';
     qs.forEach(q => body.appendChild(buildRow(q)));
     const foot = document.createElement('div'); foot.className = 'chosen-foot';
@@ -660,7 +683,7 @@
     REELS.forEach(r => {
       const reel = document.createElement('section'); reel.className = 'reel'; reel.id = 'reel-' + r.id;
       const hd = document.createElement('button'); hd.className = 'reel-head'; hd.type = 'button'; hd.setAttribute('aria-expanded', 'false');
-      hd.innerHTML = '<span><h2 class="reel-title" style="font-size:24px">' + r.title + '</h2><p class="reel-epi">' + r.epi + '</p></span>' +
+      hd.innerHTML = '<span><h2 class="reel-title" style="font-size:24px">' + r.title + '</h2>' + epiHtml(r) + '</span>' +
         '<span class="reel-meta"><span class="count" id="count-' + r.id + '"></span><svg class="chev" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 7.5l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
       hd.addEventListener('click', () => toggleReel(r.id));
       const body = document.createElement('div'); body.className = 'reel-body';
