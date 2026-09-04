@@ -1,0 +1,18 @@
+{
+  // Cloudflare Worker config for Hari's intake.
+  // Keep "name" as "hari" so the URL stays https://hari.cm-niveditha99.workers.dev
+  "name": "hari",
+  "main": "src/worker.js",
+  "compatibility_date": "2025-09-01",
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  "kv_namespaces": [
+    // Step 2 in SETUP.md: paste the ID of the KV namespace you create in the dashboard.
+    { "binding": "INTAKE_KV", "id": "2e0a73763b0445eba54a9101e3839772" }
+  ],
+  "vars": {
+    "NOTIFY_EMAIL": "cm.niveditha99@gmail.com",
+    "FROM_EMAIL": "Hari's intake <onboarding@resend.dev>",
+    "SITE_URL": "https://hari.cm-niveditha99.workers.dev"
+  },
+  "observability": { "enabled": true }
+}
